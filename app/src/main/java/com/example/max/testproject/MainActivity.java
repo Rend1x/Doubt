@@ -73,27 +73,20 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
     public static final String MESSAGES_CHILD = "choose";
-    private static final int REQUEST_INVITE = 1;
-    private static final int REQUEST_IMAGE = 2;
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 10;
     public static final String ANONYMOUS = "anonymous";
-    private static final String MESSAGE_SENT_EVENT = "message_sent";
+
     public String mUsername;
     public String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
-    private static final String MESSAGE_URL = "http://friendlychat.firebase.google.com/message/";
+
 
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private ProgressBar mProgressBar;
 
-
-    // Firebase instance variables
     public FirebaseAuth mFirebaseAuth;
     public FirebaseUser mFirebaseUser;
-
-
 
     public DatabaseReference mFirebaseDatabaseReference;
     public FirebaseRecyclerAdapter<TestProject,MessageViewHolder>
@@ -106,13 +99,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        // Set default username is anonymous.
+
         mUsername = ANONYMOUS;
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
-            // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SingInActivity.class));
             finish();
             return;
@@ -240,9 +232,6 @@ public class MainActivity extends AppCompatActivity
                 int friendlyMessageCount = mFirebaseAdapter.getItemCount();
                 int lastVisiblePosition =
                         mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-                // If the recycler view is initially being loaded or the
-                // user is at the bottom of the list, scroll to the bottom
-                // of the list to show the newly added message.
                 if (lastVisiblePosition == -1 ||
                         (positionStart >= (friendlyMessageCount - 1) &&
                                 lastVisiblePosition == (positionStart - 1))) {
@@ -257,8 +246,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in.
-        // TODO: Add code to check if user is signed in.
     }
 
     @Override
