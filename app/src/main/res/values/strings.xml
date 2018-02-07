@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TestProject</string>
+    <string name="sign_in">Присоединиться к Choose</string>
+    <string name="sign_out">Выход</string>
+
+    <string name="title_activity_add_image">AddImage</string>
+    <string name="sendButton">Поделиться</string>
+    <string name="hint_edit">Пиши здесь</string>
+</resources>
