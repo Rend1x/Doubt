@@ -52,8 +52,6 @@ public class AddImage extends MainActivity
 
     private Uri mFirebaseUriTwo;
 
-    List<Uri> massUri = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +80,7 @@ public class AddImage extends MainActivity
                                                     .child(key)
                                                     .child(mFirebaseUriOne.getLastPathSegment())
                                                     .child(mFirebaseUriTwo.getLastPathSegment());
-                                    putImageInStorage(storageReference, massUri, key);
+                                    putImageInStorage(storageReference, mFirebaseUriOne,mFirebaseUriTwo, key);
                                     mEditText.setText("");
                                 } else {
                                     Log.w(TAG, "Unable to write message to database.",
@@ -152,6 +150,7 @@ public class AddImage extends MainActivity
 
             mFirebaseUriOne = data.getData();
 
+
             try {
                 Bitmap bitmapOne = MediaStore.Images.Media.getBitmap (getContentResolver (), mFirebaseUriOne);
                 mAddImageOne.setImageBitmap(bitmapOne);
@@ -176,18 +175,11 @@ public class AddImage extends MainActivity
                 e.printStackTrace();
             }
         }
-
-        if (mFirebaseUriOne != null && mFirebaseUriTwo != null){
-
-            massUri.add(0, mFirebaseUriOne);
-            massUri.add(1, mFirebaseUriTwo);
-
-        }
     }
 
-    private void putImageInStorage(StorageReference storageReference, final List<Uri> massUri, final String key) {
+    private void putImageInStorage(StorageReference storageReference, Uri mFirebaseUriOne,Uri mFirebaseUriTwo, final String key) {
 
-            storageReference.putFile((Uri) massUri).addOnCompleteListener(AddImage.this,
+            storageReference.putFile(mFirebaseUriOne).addOnCompleteListener(AddImage.this,
                 new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
