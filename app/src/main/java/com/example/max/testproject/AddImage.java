@@ -1,15 +1,15 @@
 package com.example.max.testproject;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,21 +26,33 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class AddImage extends MainActivity
         implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "AddImage";
-    private static final String ANONYMOUS = "anonymous";
     private static final String LOADING_IMAGE_URL = "https://www.google.com/images/spin-32.gif";
     private ImageView mAddImageOne;
     private ImageView mAddImageTwo;
-    private static final int REQUEST_IMAGE = 2;
+    private static final int DEFAULT_CHS_LENGTH_LIMIT = 10;
+    private static final int Image_Request_Code_One = 1;
+    private static final int Image_Request_Code_Two = 2;
     private EditText mEditText;
     private Button mSendButton;
-    private ImageView imageViewOne;
-    private ImageView imageViewTwo;
+    private static final String FRIENDLY_CHS_LENGTH = "friendly_chs_length";
+    private ImageView mImageViewOne;
+    private ImageView mImageViewTwo;
+    private Uri mFirebaseUriOne;
 
+    private Uri mFirebaseUriTwo;
+
+    List<Uri> massUri = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +64,54 @@ public class AddImage extends MainActivity
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TestProject choose = new TestProject(mEditText.getText().toString()
+                TestProject tempMessage = new TestProject(mEditText.getText().toString()
                         ,mUsername
                         ,mPhotoUrl
-                        ,null,null);
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(choose);
-                mEditText.setText("");
+                        ,null
+                        ,null);
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
+                        .setValue(tempMessage, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError,
+                                                   DatabaseReference databaseReference) {
+                                if (databaseError == null) {
+                                    String key = databaseReference.getKey();
+                                    StorageReference storageReference =
+                                            FirebaseStorage.getInstance()
+                                                    .getReference(mFirebaseUser.getUid())
+                                                    .child(key)
+                                                    .child(mFirebaseUriOne.getLastPathSegment())
+                                                    .child(mFirebaseUriTwo.getLastPathSegment());
+                                    putImageInStorage(storageReference, massUri, key);
+                                    mEditText.setText("");
+                                } else {
+                                    Log.w(TAG, "Unable to write message to database.",
+                                            databaseError.toException());
+                                }
+                            }
+                        });
+            }
+        });
 
+
+        mEditText = (EditText) findViewById(R.id.messageEditText);
+        mEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mSharedPreferences
+                .getInt(FRIENDLY_CHS_LENGTH, DEFAULT_CHS_LENGTH_LIMIT))});
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().trim().length() > 0) {
+                    mSendButton.setEnabled(true);
+                } else {
+                    mSendButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
 
@@ -66,62 +119,87 @@ public class AddImage extends MainActivity
         mAddImageOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                imageViewOne = (ImageView) findViewById(R.id.image_one);
+
+                Intent intentOne = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intentOne.addCategory(Intent.CATEGORY_OPENABLE);
+                intentOne.setType("image/*");
+                startActivityForResult(intentOne,Image_Request_Code_One);
+
+
             }
         });
 
+        mAddImageTwo = (ImageView) findViewById(R.id.image_button_two);
+        mAddImageTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intentTwo = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intentTwo.addCategory(Intent.CATEGORY_OPENABLE);
+                intentTwo.setType("image/*");
+                startActivityForResult(intentTwo,Image_Request_Code_Two);
+
+            }
+        });
     }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+       super.onActivityResult(requestCode,resultCode,data);
 
-        if (requestCode == REQUEST_IMAGE) {
-            if (resultCode == RESULT_OK) {
-                if (data != null) {
-                    final Uri uri = data.getData();
-                    Log.d(TAG, "Uri: " + uri.toString());
+        if (requestCode == Image_Request_Code_One && resultCode == RESULT_OK && data != null  ) {
 
-                    TestProject tempMessage = new TestProject(null, mUsername, mPhotoUrl,
-                            LOADING_IMAGE_URL, LOADING_IMAGE_URL);
-                    mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
-                            .setValue(tempMessage, new DatabaseReference.CompletionListener() {
-                                @Override
-                                public void onComplete(DatabaseError databaseError,
-                                                       DatabaseReference databaseReference) {
-                                    if (databaseError == null) {
-                                        String key = databaseReference.getKey();
-                                        StorageReference storageReference =
-                                                FirebaseStorage.getInstance()
-                                                        .getReference(mFirebaseUser.getUid())
-                                                        .child(key)
-                                                        .child(uri.getLastPathSegment());
+            mFirebaseUriOne = data.getData();
 
-                                        putImageInStorage(storageReference, uri, key);
-                                    } else {
-                                        Log.w(TAG, "Unable to write message to database.",
-                                                databaseError.toException());
-                                    }
-                                }
-                            });
-                }
+            try {
+                Bitmap bitmapOne = MediaStore.Images.Media.getBitmap (getContentResolver (), mFirebaseUriOne);
+                mAddImageOne.setImageBitmap(bitmapOne);
+                mImageViewOne = (ImageView) findViewById(R.id.image_one);
+                mImageViewOne.setImageBitmap(bitmapOne);
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }else if (requestCode == Image_Request_Code_Two && resultCode == RESULT_OK && data != null){
+
+            mFirebaseUriTwo = data.getData();
+
+            try {
+
+                Bitmap bitmapTwo = MediaStore.Images.Media.getBitmap (getContentResolver (), mFirebaseUriTwo);
+                mAddImageTwo.setImageBitmap(bitmapTwo);
+                mImageViewTwo = (ImageView) findViewById(R.id.image_two);
+                mImageViewTwo.setImageBitmap(bitmapTwo);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (mFirebaseUriOne != null && mFirebaseUriTwo != null){
+
+            massUri.add(0, mFirebaseUriOne);
+            massUri.add(1, mFirebaseUriTwo);
+
         }
     }
 
-    private void putImageInStorage(StorageReference storageReference, Uri uri, final String key) {
-        storageReference.putFile(uri).addOnCompleteListener(AddImage.this,
+    private void putImageInStorage(StorageReference storageReference, final List<Uri> massUri, final String key) {
+
+            storageReference.putFile((Uri) massUri).addOnCompleteListener(AddImage.this,
                 new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
                             TestProject friendlyMessage =
-                                    new TestProject(null, mUsername, mPhotoUrl,
-                                            task.getResult().getDownloadUrl().toString(),
-                                            task.getResult().getDownloadUrl().toString());
+                                    new TestProject(
+                                            mEditText.getText().toString()
+                                            ,mUsername
+                                            ,mPhotoUrl
+                                            ,task.getResult().getDownloadUrl().toString()
+                                            ,task.getResult().getDownloadUrl().toString());
+                            mEditText.setText("");
                             mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(key)
                                     .setValue(friendlyMessage);
                         } else {
@@ -129,7 +207,7 @@ public class AddImage extends MainActivity
                                     task.getException());
                         }
                     }
-                });
+        });
     }
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {

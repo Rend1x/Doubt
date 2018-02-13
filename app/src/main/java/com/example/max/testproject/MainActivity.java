@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity
 
     public String mUsername;
     public String mPhotoUrl;
-    private SharedPreferences mSharedPreferences;
+    public SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
 
 
@@ -155,15 +156,13 @@ public class MainActivity extends AppCompatActivity
             protected void onBindViewHolder(final MessageViewHolder viewHolder,
                                             int position,
                                             TestProject choose) {
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                if (choose.getText() != null) {
-                    viewHolder.messageTextView.setText(choose.getText());
+                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+
+                    viewHolder.messageTextView.setText(choose.getYourChoose());
                     viewHolder.messageTextView.setVisibility(TextView.VISIBLE);
-                    viewHolder.messageImageViewOne.setVisibility(ImageView.GONE);
-                    viewHolder.messageImageViewTwo.setVisibility(ImageView.GONE);
-                } else {
-                    String imageUrlOne = choose.getImageUrlOne();
-                    String imageUrlTwo = choose.getImageUrlTwo();
+
+                    String imageUrlOne = String.valueOf(choose.getImageUrlOne());
+                    String imageUrlTwo = String.valueOf(choose.getImageUrlTwo());
                     if (imageUrlOne.startsWith("gs://") && imageUrlTwo.startsWith("gs://")) {
                         StorageReference storageReferenceOne = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlOne);
                         storageReferenceOne.getDownloadUrl().addOnCompleteListener(
@@ -206,13 +205,7 @@ public class MainActivity extends AppCompatActivity
                                 .load(choose.getImageUrlTwo())
                                 .into(viewHolder.messageImageViewTwo);
                     }
-                    viewHolder.messageImageViewOne.setVisibility(ImageView.VISIBLE);
-                    viewHolder.messageImageViewTwo.setVisibility(ImageView.VISIBLE);
-                    viewHolder.messageTextView.setVisibility(TextView.GONE);
-                }
-
-
-                viewHolder.messengerTextView.setText(choose.getName());
+                viewHolder.messengerTextView.setText(choose.getNameUser());
                 if (choose.getPhotoUrl() == null) {
                     viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
                             R.drawable.ic_account_circle_black_36dp));
