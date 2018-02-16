@@ -1,7 +1,12 @@
 package com.example.max.testproject;
 
 
-import com.google.firebase.storage.StorageTask;
+import android.net.Uri;
+
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestProject {
 
@@ -14,7 +19,7 @@ public class TestProject {
 
     public TestProject(){}
 
-    public TestProject(String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo) {
+    public TestProject(String yourChoose, String nameUser, String photoUrl, String imageUrlOne,String imageUrlTwo) {
         this.yourChoose = yourChoose;
         this.nameUser = nameUser;
         this.photoUrl = photoUrl;
@@ -69,6 +74,4 @@ public class TestProject {
     public void setImageUrlTwo(String imageUrlTwo){
         this.imageUrlTwo = imageUrlTwo;
     }
-
-
 }

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -19,18 +20,22 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AddImage extends MainActivity
@@ -48,9 +53,17 @@ public class AddImage extends MainActivity
     private static final String FRIENDLY_CHS_LENGTH = "friendly_chs_length";
     private ImageView mImageViewOne;
     private ImageView mImageViewTwo;
+    private StorageReference storageReference;
+    private String key;
     private Uri mFirebaseUriOne;
-
     private Uri mFirebaseUriTwo;
+
+    public String imageNameOne;
+    public String imageNameTwo;
+
+    private String downloadUrlOne;
+    private String downloadUrlTwo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,149 +71,158 @@ public class AddImage extends MainActivity
 
         setContentView(R.layout.activity_add_image);
 
+        mImageViewOne = (ImageView) findViewById(R.id.image_one);
+        mImageViewTwo = (ImageView) findViewById(R.id.image_two);
         mSendButton = (Button) findViewById(R.id.sendButton);
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TestProject tempMessage = new TestProject(mEditText.getText().toString()
-                        ,mUsername
-                        ,mPhotoUrl
-                        ,null
-                        ,null);
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
-                        .setValue(tempMessage, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError,
-                                                   DatabaseReference databaseReference) {
-                                if (databaseError == null) {
-                                    String key = databaseReference.getKey();
-                                    StorageReference storageReference =
-                                            FirebaseStorage.getInstance()
-                                                    .getReference(mFirebaseUser.getUid())
-                                                    .child(key)
-                                                    .child(mFirebaseUriOne.getLastPathSegment())
-                                                    .child(mFirebaseUriTwo.getLastPathSegment());
-                                    putImageInStorage(storageReference, mFirebaseUriOne,mFirebaseUriTwo, key);
-                                    mEditText.setText("");
-                                } else {
-                                    Log.w(TAG, "Unable to write message to database.",
-                                            databaseError.toException());
-                                }
-                            }
-                        });
-            }
-        });
+        mEditText =(EditText) findViewById(R.id.messageEditText);
 
-
-        mEditText = (EditText) findViewById(R.id.messageEditText);
-        mEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mSharedPreferences
-                .getInt(FRIENDLY_CHS_LENGTH, DEFAULT_CHS_LENGTH_LIMIT))});
-        mEditText.addTextChangedListener(new TextWatcher() {
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        storageReference = FirebaseStorage.getInstance().getReference(mFirebaseUser.getUid());
+        mFirebaseDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().trim().length() > 0) {
-                    mSendButton.setEnabled(true);
-                } else {
-                    mSendButton.setEnabled(false);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null){
+                    return;
                 }
+                Map<String, Object> updatedFlower = (Map<String, Object>) dataSnapshot.getValue();
+                Log.i(TAG, "updatedFlower = "+updatedFlower.toString());
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i(TAG, "onCancelled");
             }
         });
+    }
+    public void handleChooseImageOne(View view) {
+        Intent pickerPhotoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickerPhotoIntent, 0);
+    }
 
-        mAddImageOne = (ImageView) findViewById(R.id.image_button_one);
-        mAddImageOne.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+    public void handleChooseImageTwo(View view) {
+        Intent pickerPhotoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickerPhotoIntent, 1);
+    }
 
-                Intent intentOne = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intentOne.addCategory(Intent.CATEGORY_OPENABLE);
-                intentOne.setType("image/*");
-                startActivityForResult(intentOne,Image_Request_Code_One);
+    public void handleUploadChoose(View view){
 
+        if (TextUtils.isEmpty(mEditText.getText().toString())){
+            Toast.makeText(this,"Your choose null",Toast.LENGTH_SHORT);
+            return;
+        }
+        if (mImageViewOne.getDrawable()==null){
+            Toast.makeText(this,"You must select image",Toast.LENGTH_SHORT);
+            return;
+        }
+        if (mImageViewTwo.getDrawable()==null){
+            Toast.makeText(this,"You must select image",Toast.LENGTH_SHORT);
+            return;
+        }
 
-            }
-        });
+        TestProject upload = new TestProject(mEditText.getText().toString()
+                ,mUsername
+                ,mPhotoUrl
+                ,downloadUrlOne
+                ,downloadUrlTwo);
+        mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
+                .setValue(upload, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError,
+                                           DatabaseReference databaseReference) {
+                        if (databaseError == null) {
+                            String key = databaseReference.getKey();
+                            StorageReference storageReference =
+                                    FirebaseStorage.getInstance()
+                                            .getReference(mFirebaseUser.getUid())
+                                            .child(key)
+                                            .child(mFirebaseUriOne.getLastPathSegment())
+                                            .child(mFirebaseUriTwo.getLastPathSegment());
 
-        mAddImageTwo = (ImageView) findViewById(R.id.image_button_two);
-        mAddImageTwo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intentTwo = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intentTwo.addCategory(Intent.CATEGORY_OPENABLE);
-                intentTwo.setType("image/*");
-                startActivityForResult(intentTwo,Image_Request_Code_Two);
-
-            }
-        });
+                            uploadImageToFirebaseOne(storageReference,key,mFirebaseUriOne);
+                            uploadImageToFirebaseTwo(storageReference,key,mFirebaseUriTwo);
+                        } else {
+                            Log.w(TAG, "Unable to write message to database.",
+                                    databaseError.toException());
+                        }
+                    }
+                });
+        Toast.makeText(AddImage.this,"Upload your choose",Toast.LENGTH_SHORT);
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       super.onActivityResult(requestCode,resultCode,data);
-
-        if (requestCode == Image_Request_Code_One && resultCode == RESULT_OK && data != null  ) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == RESULT_OK && data != null  ) {
 
             mFirebaseUriOne = data.getData();
+            Log.i(TAG, "selected Image = " + mFirebaseUriOne);
+            mImageViewOne.setImageURI(mFirebaseUriOne);
+            uploadImageToFirebaseOne(storageReference,key,mFirebaseUriOne);
 
-
-            try {
-                Bitmap bitmapOne = MediaStore.Images.Media.getBitmap (getContentResolver (), mFirebaseUriOne);
-                mAddImageOne.setImageBitmap(bitmapOne);
-                mImageViewOne = (ImageView) findViewById(R.id.image_one);
-                mImageViewOne.setImageBitmap(bitmapOne);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else if (requestCode == Image_Request_Code_Two && resultCode == RESULT_OK && data != null){
-
+        }else if (requestCode == 1 && resultCode == RESULT_OK && data != null){
             mFirebaseUriTwo = data.getData();
-
-            try {
-
-                Bitmap bitmapTwo = MediaStore.Images.Media.getBitmap (getContentResolver (), mFirebaseUriTwo);
-                mAddImageTwo.setImageBitmap(bitmapTwo);
-                mImageViewTwo = (ImageView) findViewById(R.id.image_two);
-                mImageViewTwo.setImageBitmap(bitmapTwo);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Log.i(TAG, "selected Image = "+ mFirebaseUriTwo);
+            mImageViewTwo.setImageURI(mFirebaseUriTwo);
+            uploadImageToFirebaseTwo(storageReference,key,mFirebaseUriTwo);
         }
     }
 
-    private void putImageInStorage(StorageReference storageReference, Uri mFirebaseUriOne,Uri mFirebaseUriTwo, final String key) {
+    private void uploadImageToFirebaseOne(StorageReference storageReference, String key, Uri mFirebaseUriOne) {
+        // Get the data from an ImageView as bytes
+        mImageViewOne.setDrawingCacheEnabled(true);
+        mImageViewOne.buildDrawingCache();
+        Bitmap bitmap = mImageViewOne.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        //StorageReference mountainsRef = storageReference.child("image1.jpg");
+        imageNameOne = StringUtils.getRandomString(20 ) + ".jpg";
+        StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameOne);
+        UploadTask uploadTask = mountainsRef.putBytes(data);
 
-            storageReference.putFile(mFirebaseUriOne).addOnCompleteListener(AddImage.this,
-                new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            TestProject friendlyMessage =
-                                    new TestProject(
-                                            mEditText.getText().toString()
-                                            ,mUsername
-                                            ,mPhotoUrl
-                                            ,task.getResult().getDownloadUrl().toString()
-                                            ,task.getResult().getDownloadUrl().toString());
-                            mEditText.setText("");
-                            mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(key)
-                                    .setValue(friendlyMessage);
-                        } else {
-                            Log.w(TAG, "Image upload task was not successful.",
-                                    task.getException());
-                        }
-                    }
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.i(TAG, "Upload failed");
+            }
+        }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                downloadUrlOne = task.getResult().getDownloadUrl().toString();
+                Log.i(TAG, "Upload successful, downloadUrl = "+ downloadUrlOne);
+            }
         });
     }
+    private void uploadImageToFirebaseTwo(StorageReference storageReference, String key, Uri mFirebaseUriTwo) {
+        // Get the data from an ImageView as bytes
+        mImageViewTwo.setDrawingCacheEnabled(true);
+        mImageViewTwo.buildDrawingCache();
+        Bitmap bitmap = mImageViewTwo.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        //StorageReference mountainsRef = storageReference.child("image2.jpg");
+        imageNameTwo = StringUtils.getRandomString(20)  + ".jpg";
+        StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameTwo);
+        UploadTask uploadTask = mountainsRef.putBytes(data);
+
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.i(TAG, "Upload failed");
+            }
+        }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                downloadUrlTwo = task.getResult().getDownloadUrl().toString();
+                Log.i(TAG, "Upload successful, downloadUrl = "+ downloadUrlTwo);
+            }
+        });
+    }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed:" + connectionResult);

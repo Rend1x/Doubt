@@ -23,12 +23,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_weight="1.0">
+
                 <ImageView
                     android:id="@+id/image_one"
-                    android:layout_width="match_parent"
-                    android:layout_height="256dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:layout_gravity="center|top"
-                    android:background="@color/colorPrimary"/>
+                    android:background="@color/colorPrimary"
+                    android:onClick="handleChooseImageOne" />
             </LinearLayout>
 
             <LinearLayout
@@ -38,80 +40,22 @@
                 android:layout_weight="1.0">
                 <ImageView
                     android:id="@+id/image_two"
-                    android:layout_width="match_parent"
-                    android:layout_height="256dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:onClick="handleChooseImageTwo"
                     android:layout_gravity="center|top"
                     android:background="@color/colorPrimaryDark"/>
             </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="DuplicateIds,UselessParent">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="true">
-
-                <LinearLayout
-                    android:id="@+id/fullscreen_content_controls"
-                    style="?metaButtonBarStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:gravity="fill_vertical"
-                    android:orientation="horizontal"
-                    tools:ignore="UselessParent">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1.0"
-                        android:orientation="vertical">
-
-                        <ImageButton
-                            android:id="@+id/image_button_one"
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            app:srcCompat="@drawable/add_image_button" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1.0"
-                        android:orientation="vertical">
-                        <ImageButton
-                            android:id="@+id/image_button_two"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            app:srcCompat="@drawable/add_image_button" />
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-
-
-
-            </FrameLayout>
-
-        </LinearLayout>
 
         <Button
             android:id="@+id/sendButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|top"
+            android:onClick="handleUploadChoose"
             android:text="@string/sendButton" />
 
         <EditText
