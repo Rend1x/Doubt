@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -85,7 +86,7 @@ public class AddImage extends MainActivity
                     return;
                 }
                 Map<String, Object> updatedFlower = (Map<String, Object>) dataSnapshot.getValue();
-                Log.i(TAG, "updatedFlower = "+updatedFlower.toString());
+                Log.i(TAG, "updatedFlower = " + updatedFlower.toString());
             }
 
             @Override
@@ -169,17 +170,10 @@ public class AddImage extends MainActivity
     }
 
     private void uploadImageToFirebaseOne(StorageReference storageReference, String key, Uri mFirebaseUriOne) {
-        // Get the data from an ImageView as bytes
-        mImageViewOne.setDrawingCacheEnabled(true);
-        mImageViewOne.buildDrawingCache();
-        Bitmap bitmap = mImageViewOne.getDrawingCache();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-        //StorageReference mountainsRef = storageReference.child("image1.jpg");
+
         imageNameOne = StringUtils.getRandomString(20 ) + ".jpg";
         StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameOne);
-        UploadTask uploadTask = mountainsRef.putBytes(data);
+        UploadTask uploadTask = mountainsRef.putFile(mFirebaseUriOne);
 
         uploadTask.addOnFailureListener(new OnFailureListener() {
 
@@ -196,17 +190,10 @@ public class AddImage extends MainActivity
         });
     }
     private void uploadImageToFirebaseTwo(StorageReference storageReference, String key, Uri mFirebaseUriTwo) {
-        // Get the data from an ImageView as bytes
-        mImageViewTwo.setDrawingCacheEnabled(true);
-        mImageViewTwo.buildDrawingCache();
-        Bitmap bitmap = mImageViewTwo.getDrawingCache();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-        //StorageReference mountainsRef = storageReference.child("image2.jpg");
+
         imageNameTwo = StringUtils.getRandomString(20)  + ".jpg";
         StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameTwo);
-        UploadTask uploadTask = mountainsRef.putBytes(data);
+        UploadTask uploadTask = mountainsRef.putFile(mFirebaseUriTwo);
 
         uploadTask.addOnFailureListener(new OnFailureListener() {
 

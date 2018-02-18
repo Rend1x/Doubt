@@ -52,8 +52,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center|bottom"
                     android:adjustViewBounds="true"
-                    android:background="@color/colorPrimary"
-                    android:backgroundTint="@color/colorPrimaryDark"
                     android:scaleType="fitCenter" />
 
             </LinearLayout>
@@ -69,8 +67,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:background="@color/colorPrimary"
-                    android:backgroundTint="@color/colorPrimary"
                     android:scaleType="fitCenter" />
 
             </LinearLayout>
