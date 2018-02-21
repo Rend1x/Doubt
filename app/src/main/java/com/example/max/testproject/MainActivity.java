@@ -38,6 +38,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -46,11 +48,11 @@ public class MainActivity extends AppCompatActivity
 
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        TextView messageTextView;
-        ImageView messageImageViewOne;
-        ImageView messageImageViewTwo;
-        TextView messengerTextView;
-        CircleImageView messengerImageView;
+        public TextView messageTextView;
+        public ImageView messageImageViewOne;
+        public ImageView messageImageViewTwo;
+        public TextView messengerTextView;
+        public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
             super(v);
@@ -71,11 +73,6 @@ public class MainActivity extends AppCompatActivity
     public SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
 
-    private Uri mFirebaseUriOne;
-    private Uri mFirebaseUriTwo;
-
-
-
 
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -83,6 +80,9 @@ public class MainActivity extends AppCompatActivity
 
     public FirebaseAuth mFirebaseAuth;
     public FirebaseUser mFirebaseUser;
+
+    public ImageView messageImageViewOne;
+    public ImageView messageImageViewTwo;
 
     public DatabaseReference mFirebaseDatabaseReference;
     public FirebaseRecyclerAdapter<TestProject,MessageViewHolder>
@@ -122,7 +122,8 @@ public class MainActivity extends AppCompatActivity
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-
+        messageImageViewOne = (ImageView) findViewById(R.id.messageImageViewOne);
+        messageImageViewTwo = (ImageView) findViewById(R.id.messageImageViewTwo);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         SnapshotParser<TestProject> parser = new SnapshotParser<TestProject>() {
             @Override
@@ -229,6 +230,23 @@ public class MainActivity extends AppCompatActivity
         });
 
         mMessageRecyclerView.setAdapter(mFirebaseAdapter);
+
+
+        messageImageViewOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChooseView chooseView = new ChooseView();
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().updateChildren((Map<String, Object>) chooseView);
+
+            }
+        });
+
+        messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     @Override
