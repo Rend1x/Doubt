@@ -14,16 +14,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,11 +31,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.Key;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -150,15 +142,13 @@ public class AddImage extends MainActivity
                                                 .child(key)
                                                 .child(mFirebaseUriOne.getLastPathSegment())
                                                 .child(mFirebaseUriTwo.getLastPathSegment());
-                                uploadImageToFirebaseOne(storageReference,key,mFirebaseUriOne);
-                                uploadImageToFirebaseTwo(storageReference,key,mFirebaseUriTwo);
+
                             } else {
                                 Log.w(TAG, "Unable to write message to database.",
                                         databaseError.toException());
                             }
                             if (upload != null){
                                 Intent backToActivity = new Intent(AddImage.this, MainActivity.class);
-                                backToActivity.putExtra("key",key);
                                 startActivity(backToActivity);
                                 finish();
                             }
@@ -178,17 +168,17 @@ public class AddImage extends MainActivity
             mFirebaseUriOne = data.getData();
             Log.i(TAG, "selected Image = " + mFirebaseUriOne);
             mImageViewOne.setImageURI(mFirebaseUriOne);
-            uploadImageToFirebaseOne(storageReference,key,mFirebaseUriOne);
+            uploadImageToFirebaseOne();
 
         }else if (requestCode == Image_Request_Code_Two && resultCode == RESULT_OK && data != null){
             mFirebaseUriTwo = data.getData();
             Log.i(TAG, "selected Image = "+ mFirebaseUriTwo);
             mImageViewTwo.setImageURI(mFirebaseUriTwo);
-            uploadImageToFirebaseTwo(storageReference,key,mFirebaseUriTwo);
+            uploadImageToFirebaseTwo();
         }
     }
 
-    private void uploadImageToFirebaseOne(StorageReference storageReference, String key, Uri mFirebaseUriOne) {
+    private void uploadImageToFirebaseOne() {
 
         imageNameOne = StringUtils.getRandomString(20 ) + ".png";
         StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameOne);
@@ -208,7 +198,7 @@ public class AddImage extends MainActivity
             }
         });
     }
-    private void uploadImageToFirebaseTwo(StorageReference storageReference, String key, Uri mFirebaseUriTwo) {
+    private void uploadImageToFirebaseTwo() {
 
         imageNameTwo = StringUtils.getRandomString(20)  + ".png";
         StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameTwo);

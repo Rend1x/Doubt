@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity
     public static final String MESSAGES_CHILD = "choose";
     public static final String ANONYMOUS = "anonymous";
 
-    public String key;
 
     public String mUsername;
     public String mPhotoUrl;
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
 
@@ -170,7 +169,7 @@ public class MainActivity extends AppCompatActivity
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
                 viewHolder.messageTextView.setText(choose.getYourChoose());
-                viewHolder.messageTextView.setVisibility(TextView.VISIBLE);
+
                 String imageUrlOne = choose.getImageUrlOne();
                 String imageUrlTwo = choose.getImageUrlTwo();
 
@@ -256,18 +255,19 @@ public class MainActivity extends AppCompatActivity
                         upvotes.runTransaction(new Transaction.Handler() {
                             @Override
                             public Transaction.Result doTransaction(MutableData mutableData) {
-                               likeTwo = mutableData.getValue(Integer.class);
+                                likeTwo = mutableData.getValue(Integer.class);
                                 if (likeTwo == null) {
                                     return Transaction.success(mutableData);
                                 }
 
                                 likeTwo++;
                                 mutableData.setValue(likeTwo);
-                                Log.i(TAG, "value vote: "  + likeTwo);
+                                Log.i(TAG, "value vote: " + likeTwo);
                                 return Transaction.success(mutableData);
 
 
                             }
+
                             @Override
                             public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                                 Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
