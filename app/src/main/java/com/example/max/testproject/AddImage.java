@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,10 +32,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +46,7 @@ public class AddImage extends MainActivity
         implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "AddImage";
-    private static final String LOADING_IMAGE_URL = "https://www.google.com/images/spin-32.gif";
+
     private static final int Image_Request_Code_One = 1;
     private static final int Image_Request_Code_Two = 2;
     private EditText mEditText;
@@ -51,7 +54,6 @@ public class AddImage extends MainActivity
     private ImageView mImageViewOne;
     private ImageView mImageViewTwo;
     private StorageReference storageReference;
-    private String key;
     private Uri mFirebaseUriOne;
     private Uri mFirebaseUriTwo;
 
@@ -60,6 +62,9 @@ public class AddImage extends MainActivity
 
     private String downloadUrlOne;
     private String downloadUrlTwo;
+
+    private StorageTask uploadTaskOne;
+    private StorageTask uploadTaskTwo;
 
 
     @Override
@@ -109,6 +114,11 @@ public class AddImage extends MainActivity
     mSendButton.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+
+            if (uploadTaskOne != null && uploadTaskOne.isInProgress() && uploadTaskTwo != null && uploadTaskTwo.isInProgress()){
+                Toast.makeText(AddImage.this,"Uploading",Toast.LENGTH_SHORT);
+
+            }else{
             if (TextUtils.isEmpty(mEditText.getText().toString())){
                 Toast.makeText(AddImage.this,"Your choose null",Toast.LENGTH_SHORT);
                 return;
@@ -122,40 +132,46 @@ public class AddImage extends MainActivity
                 return;
             }
 
-            TestProject upload = new TestProject(mEditText.getText().toString()
+            final TestProject upload = new TestProject(mEditText.getText().toString()
                     ,mUsername
                     ,mPhotoUrl
                     ,downloadUrlOne
-                    ,downloadUrlTwo);
+                    ,downloadUrlTwo,0,0);
             mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
                     .setValue(upload, new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(DatabaseError databaseError,
                                                DatabaseReference databaseReference) {
                             if (databaseError == null) {
-                                String key = databaseReference.getKey();
+                                String key = databaseReference.child(MESSAGES_CHILD).getParent().getKey();
                                 StorageReference storageReference =
                                         FirebaseStorage.getInstance()
                                                 .getReference(mFirebaseUser.getUid())
                                                 .child(key)
                                                 .child(mFirebaseUriOne.getLastPathSegment())
                                                 .child(mFirebaseUriTwo.getLastPathSegment());
-
                                 uploadImageToFirebaseOne(storageReference,key,mFirebaseUriOne);
                                 uploadImageToFirebaseTwo(storageReference,key,mFirebaseUriTwo);
                             } else {
                                 Log.w(TAG, "Unable to write message to database.",
                                         databaseError.toException());
                             }
+                            if (upload != null){
+                                Intent backToActivity = new Intent(AddImage.this, MainActivity.class);
+                                backToActivity.putExtra("key",key);
+                                startActivity(backToActivity);
+                                finish();
+                            }
                         }
                     });
             Toast.makeText(AddImage.this,"Upload your choose",Toast.LENGTH_SHORT);
+            }
         }
     });
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Image_Request_Code_One && resultCode == RESULT_OK && data != null  ) {
 
@@ -174,11 +190,11 @@ public class AddImage extends MainActivity
 
     private void uploadImageToFirebaseOne(StorageReference storageReference, String key, Uri mFirebaseUriOne) {
 
-        imageNameOne = StringUtils.getRandomString(20 ) + ".jpg";
+        imageNameOne = StringUtils.getRandomString(20 ) + ".png";
         StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameOne);
-        UploadTask uploadTask = mountainsRef.putFile(mFirebaseUriOne);
+        uploadTaskOne = mountainsRef.putFile(mFirebaseUriOne);
 
-        uploadTask.addOnFailureListener(new OnFailureListener() {
+        uploadTaskOne.addOnFailureListener(new OnFailureListener() {
 
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -194,11 +210,11 @@ public class AddImage extends MainActivity
     }
     private void uploadImageToFirebaseTwo(StorageReference storageReference, String key, Uri mFirebaseUriTwo) {
 
-        imageNameTwo = StringUtils.getRandomString(20)  + ".jpg";
+        imageNameTwo = StringUtils.getRandomString(20)  + ".png";
         StorageReference mountainsRef = storageReference.child(mFirebaseUser.getUid()).child(imageNameTwo);
-        UploadTask uploadTask = mountainsRef.putFile(mFirebaseUriTwo);
+        uploadTaskTwo = mountainsRef.putFile(mFirebaseUriTwo);
 
-        uploadTask.addOnFailureListener(new OnFailureListener() {
+        uploadTaskTwo.addOnFailureListener(new OnFailureListener() {
 
             @Override
             public void onFailure(@NonNull Exception exception) {

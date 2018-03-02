@@ -8,6 +8,7 @@ import com.google.firebase.database.Exclude;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class TestProject {
 
     private String id;
@@ -16,15 +17,25 @@ public class TestProject {
     private String photoUrl;
     private String imageUrlOne;
     private String imageUrlTwo;
+    private int chooseOne;
+    private int chooseTwo;
+
+
+
 
     public TestProject(){}
 
-    public TestProject(String yourChoose, String nameUser, String photoUrl, String imageUrlOne,String imageUrlTwo) {
+
+
+    public TestProject(String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo , int chooseOne , int chooseTwo) {
         this.yourChoose = yourChoose;
         this.nameUser = nameUser;
         this.photoUrl = photoUrl;
         this.imageUrlOne = imageUrlOne;
         this.imageUrlTwo = imageUrlTwo;
+        this.chooseOne = chooseOne;
+        this.chooseTwo = chooseTwo;
+
     }
 
     public String getId() {
@@ -74,4 +85,22 @@ public class TestProject {
     public void setImageUrlTwo(String imageUrlTwo){
         this.imageUrlTwo = imageUrlTwo;
     }
+
+    public int getChooseOne() {
+        return chooseOne;
+    }
+
+    public void setChooseOne(int chooseOne) {
+        this.chooseOne = chooseOne;
+    }
+
+    public int getChooseTwo() {
+        return chooseTwo;
+    }
+
+    public void setChooseTwo(int chooseTwo) {
+        this.chooseTwo = chooseTwo;
+    }
+
+
 }

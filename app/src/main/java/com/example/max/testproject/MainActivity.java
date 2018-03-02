@@ -1,4 +1,6 @@
 package com.example.max.testproject;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -29,29 +31,34 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 public class MainActivity extends AppCompatActivity
-    implements GoogleApiClient.OnConnectionFailedListener{
-
+        implements GoogleApiClient.OnConnectionFailedListener {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
         public ImageView messageImageViewOne;
         public ImageView messageImageViewTwo;
         public TextView messengerTextView;
+        public TextView countViewOne;
+        public TextView countViewTwo;
         public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
@@ -61,6 +68,10 @@ public class MainActivity extends AppCompatActivity
             messageImageViewTwo = (ImageView) itemView.findViewById(R.id.messageImageViewTwo);
             messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
+            countViewOne = (TextView) itemView.findViewById(R.id.choose_count_one);
+            countViewTwo = (TextView) itemView.findViewById(R.id.choose_count_two);
+
+
         }
     }
 
@@ -68,11 +79,15 @@ public class MainActivity extends AppCompatActivity
     public static final String MESSAGES_CHILD = "choose";
     public static final String ANONYMOUS = "anonymous";
 
+    public String key;
+
     public String mUsername;
     public String mPhotoUrl;
     public SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
 
+    Integer likeOne;
+    Integer likeTwo;
 
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -81,13 +96,13 @@ public class MainActivity extends AppCompatActivity
     public FirebaseAuth mFirebaseAuth;
     public FirebaseUser mFirebaseUser;
 
+
     public ImageView messageImageViewOne;
     public ImageView messageImageViewTwo;
 
     public DatabaseReference mFirebaseDatabaseReference;
-    public FirebaseRecyclerAdapter<TestProject,MessageViewHolder>
+    public FirebaseRecyclerAdapter<TestProject, MessageViewHolder>
             mFirebaseAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +140,7 @@ public class MainActivity extends AppCompatActivity
         messageImageViewOne = (ImageView) findViewById(R.id.messageImageViewOne);
         messageImageViewTwo = (ImageView) findViewById(R.id.messageImageViewTwo);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
         SnapshotParser<TestProject> parser = new SnapshotParser<TestProject>() {
             @Override
             public TestProject parseSnapshot(DataSnapshot dataSnapshot) {
@@ -135,7 +151,6 @@ public class MainActivity extends AppCompatActivity
                 return choose;
             }
         };
-
         DatabaseReference messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD);
         FirebaseRecyclerOptions<TestProject> options =
                 new FirebaseRecyclerOptions.Builder<TestProject>()
@@ -151,62 +166,164 @@ public class MainActivity extends AppCompatActivity
             @Override
             protected void onBindViewHolder(final MessageViewHolder viewHolder,
                                             int position,
-                                            TestProject choose) {
-                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                                            final TestProject choose) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
-                    viewHolder.messageTextView.setText(choose.getYourChoose());
-                    viewHolder.messageTextView.setVisibility(TextView.VISIBLE);
+                viewHolder.messageTextView.setText(choose.getYourChoose());
+                viewHolder.messageTextView.setVisibility(TextView.VISIBLE);
+                String imageUrlOne = choose.getImageUrlOne();
+                String imageUrlTwo = choose.getImageUrlTwo();
 
-                    String imageUrlOne = choose.getImageUrlOne();
-                    String imageUrlTwo = choose.getImageUrlTwo();
-                    if (imageUrlOne.startsWith("gs://") && imageUrlTwo.startsWith("gs://")) {
-                        StorageReference storageReferenceOne = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlOne);
-                        storageReferenceOne.getDownloadUrl().addOnCompleteListener(
-                                new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        if (task.isSuccessful()) {
-                                            String downloadUrlOne = task.getResult().toString();
-                                            Glide.with(viewHolder.messageImageViewOne.getContext())
-                                                    .load(downloadUrlOne)
-                                                    .into(viewHolder.messageImageViewOne);
 
-                                        } else {
-                                            Log.w(TAG, "Getting download url was not successful.",
-                                                    task.getException());
-                                        }
-                                    }
-                                });
-                        StorageReference storageReferenceTwo = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlTwo);
-                        storageReferenceTwo.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                StorageReference storageReferenceOne = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlOne);
+                storageReferenceOne.getDownloadUrl().addOnCompleteListener(
+                        new OnCompleteListener<Uri>() {
                             @Override
                             public void onComplete(@NonNull Task<Uri> task) {
-                                if (task.isSuccessful()){
-                                    String downloadUrlTwo = task.getResult().toString();
-                                    Glide.with(viewHolder.messageImageViewTwo.getContext())
-                                            .load(downloadUrlTwo)
-                                            .into(viewHolder.messageImageViewTwo);
-                                }else {
+                                if (task.isSuccessful()) {
+                                    String downloadUrlOne = task.getResult().toString();
+                                    Picasso.with(viewHolder.messageImageViewOne.getContext())
+                                            .load(downloadUrlOne)
+                                            .placeholder(R.mipmap.ic_launcher)
+                                            .into(viewHolder.messageImageViewOne);
+
+                                } else {
                                     Log.w(TAG, "Getting download url was not successful.",
                                             task.getException());
                                 }
                             }
                         });
 
-                    } else {
-                        Glide.with(viewHolder.messageImageViewOne.getContext())
-                                .load(choose.getImageUrlOne())
-                                .into(viewHolder.messageImageViewOne);
-                        Glide.with(viewHolder.messageImageViewTwo.getContext())
-                                .load(choose.getImageUrlTwo())
-                                .into(viewHolder.messageImageViewTwo);
+                viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Log.d(TAG, "Keyy " + choose.getId());
+
+                        DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+                                .child(choose.getId()).child("chooseOne");
+                        upvotes.runTransaction(new Transaction.Handler() {
+                            @Override
+                            public Transaction.Result doTransaction(MutableData mutableData) {
+                                likeOne = mutableData.getValue(Integer.class);
+                                if (likeOne == null) {
+                                    return Transaction.success(mutableData);
+                                }
+                                likeOne++;
+                                mutableData.setValue(likeOne);
+                                return Transaction.success(mutableData);
+                            }
+
+                            @Override
+                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                            }
+                        });
+
                     }
+
+                });
+
+
+
+
+                StorageReference storageReferenceTwo = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlTwo);
+                storageReferenceTwo.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            String downloadUrlTwo = task.getResult().toString();
+                            Picasso.with(viewHolder.messageImageViewTwo.getContext())
+                                    .load(downloadUrlTwo)
+                                    .placeholder(R.mipmap.ic_launcher)
+                                    .into(viewHolder.messageImageViewTwo);
+                        } else {
+                            Log.w(TAG, "Getting download url was not successful.",
+                                    task.getException());
+                        }
+                    }
+                });
+
+
+                viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View view) {
+
+                        Log.d(TAG, "Keyyy " + choose.getId());
+
+                        DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+                                .child(choose.getId()).child("chooseTwo");
+                        upvotes.runTransaction(new Transaction.Handler() {
+                            @Override
+                            public Transaction.Result doTransaction(MutableData mutableData) {
+                               likeTwo = mutableData.getValue(Integer.class);
+                                if (likeTwo == null) {
+                                    return Transaction.success(mutableData);
+                                }
+
+                                likeTwo++;
+                                mutableData.setValue(likeTwo);
+                                Log.i(TAG, "value vote: "  + likeTwo);
+                                return Transaction.success(mutableData);
+
+
+                            }
+                            @Override
+                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                            }
+                        });
+
+
+                    }
+                });
+
+                ValueEventListener valueEventListenerOne = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                        int likeone = dataSnapshot.child(MESSAGES_CHILD).child(choose.getId()).child("chooseOne").getValue(Integer.class);
+
+                        viewHolder.countViewOne.setText("За первое фото проголосавали: "  +  likeone);
+                        Log.i(TAG, "value votee: "  + likeone);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+
+                ValueEventListener valueEventListenerTwo = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        int liketwo = dataSnapshot.child(MESSAGES_CHILD).child(choose.getId()).child("chooseTwo").getValue(Integer.class);
+
+
+                        viewHolder.countViewTwo.setText("За второе фото проголосавали: "  +  liketwo);
+                        Log.i(TAG, "value votee: "  + liketwo);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+
+                mFirebaseDatabaseReference.addValueEventListener(valueEventListenerOne);
+                mFirebaseDatabaseReference.addValueEventListener(valueEventListenerTwo);
+
+
                 viewHolder.messengerTextView.setText(choose.getNameUser());
                 if (choose.getPhotoUrl() == null) {
                     viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
                             R.drawable.ic_account_circle_black_36dp));
                 } else {
-                    Glide.with(MainActivity.this)
+                    Picasso.with(MainActivity.this)
                             .load(choose.getPhotoUrl())
                             .into(viewHolder.messengerImageView);
                 }
@@ -228,25 +345,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
         mMessageRecyclerView.setAdapter(mFirebaseAdapter);
-
-
-        messageImageViewOne.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ChooseView chooseView = new ChooseView();
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().updateChildren((Map<String, Object>) chooseView);
-
-            }
-        });
-
-        messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
     }
 
     @Override
@@ -280,12 +379,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient);
                 mUsername = ANONYMOUS;
-                startActivity(new Intent(this,SingInActivity.class));
+                startActivity(new Intent(this, SingInActivity.class));
                 finish();
                 return true;
             default:
@@ -294,10 +393,11 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void addImage(View v){
-        Intent addImageObj = new Intent(this,AddImage.class);
+    public void addImage(View v) {
+        Intent addImageObj = new Intent(this, AddImage.class);
         startActivity(addImageObj);
     }
+
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
