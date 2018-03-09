@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -70,8 +71,6 @@ public class MainActivity extends AppCompatActivity
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
             countViewOne = (TextView) itemView.findViewById(R.id.choose_count_one);
             countViewTwo = (TextView) itemView.findViewById(R.id.choose_count_two);
-
-
         }
     }
 
@@ -79,14 +78,17 @@ public class MainActivity extends AppCompatActivity
     public static final String MESSAGES_CHILD = "choose";
     public static final String ANONYMOUS = "anonymous";
 
-
     public String mUsername;
+    public String nameUser;
+    public String mUserId;
     public String mPhotoUrl;
     public SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
 
     Integer likeOne;
     Integer likeTwo;
+    private static Integer viewLikeOne;
+    private static Integer viewLikeTwo;
 
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mUserId = mFirebaseUser.getUid();
         if (mFirebaseUser == null) {
             startActivity(new Intent(this, SingInActivity.class));
             finish();
@@ -145,16 +148,18 @@ public class MainActivity extends AppCompatActivity
             public TestProject parseSnapshot(DataSnapshot dataSnapshot) {
                 TestProject choose = dataSnapshot.getValue(TestProject.class);
                 if (choose != null) {
-                    choose.setId(dataSnapshot.getKey());
+                    choose.setmKey(dataSnapshot.getKey());
                 }
                 return choose;
             }
         };
+
         DatabaseReference messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD);
         FirebaseRecyclerOptions<TestProject> options =
                 new FirebaseRecyclerOptions.Builder<TestProject>()
                         .setQuery(messagesRef, parser)
                         .build();
+
         mFirebaseAdapter = new FirebaseRecyclerAdapter<TestProject, MessageViewHolder>(options) {
             @Override
             public MessageViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -172,7 +177,6 @@ public class MainActivity extends AppCompatActivity
 
                 String imageUrlOne = choose.getImageUrlOne();
                 String imageUrlTwo = choose.getImageUrlTwo();
-
 
                 StorageReference storageReferenceOne = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlOne);
                 storageReferenceOne.getDownloadUrl().addOnCompleteListener(
@@ -193,39 +197,6 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
 
-                viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        Log.d(TAG, "Keyy " + choose.getId());
-
-                        DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
-                                .child(choose.getId()).child("chooseOne");
-                        upvotes.runTransaction(new Transaction.Handler() {
-                            @Override
-                            public Transaction.Result doTransaction(MutableData mutableData) {
-                                likeOne = mutableData.getValue(Integer.class);
-                                if (likeOne == null) {
-                                    return Transaction.success(mutableData);
-                                }
-                                likeOne++;
-                                mutableData.setValue(likeOne);
-                                return Transaction.success(mutableData);
-                            }
-
-                            @Override
-                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                                Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
-                            }
-                        });
-
-                    }
-
-                });
-
-
-
-
                 StorageReference storageReferenceTwo = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrlTwo);
                 storageReferenceTwo.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                     @Override
@@ -243,80 +214,150 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
+                    if (mUserId.equals(choose.getId())){
 
-                viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View view) {
-
-                        Log.d(TAG, "Keyyy " + choose.getId());
-
-                        DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
-                                .child(choose.getId()).child("chooseTwo");
-                        upvotes.runTransaction(new Transaction.Handler() {
+                        ValueEventListener valueEventListener = new ValueEventListener() {
                             @Override
-                            public Transaction.Result doTransaction(MutableData mutableData) {
-                                likeTwo = mutableData.getValue(Integer.class);
-                                if (likeTwo == null) {
-                                    return Transaction.success(mutableData);
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                viewLikeOne = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseOne").getValue(Integer.class);
+                                viewLikeTwo = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseTwo").getValue(Integer.class);
+
+                                Log.i(TAG,"help 2 " + viewLikeOne);
+                                Log.i(TAG,"help 3 " + viewLikeTwo);
+
+                                viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                                viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        };
+
+                        mFirebaseDatabaseReference.addValueEventListener(valueEventListener);
+
+                    }else {
+
+                        Log.i(TAG,"help 4 " + nameUser);
+
+                        ValueEventListener valueEventListenerm = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                nameUser = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers")
+                                        .child(mFirebaseAuth.getCurrentUser().getDisplayName()).getValue(String.class);
+
+                                Log.i(TAG,"help 1 " + nameUser);
+
+                                if (mFirebaseUser.getUid().equals(nameUser)){
+
+                                    Log.i(TAG,"help 5 " + nameUser);
+
+                                    viewHolder.messageImageViewOne.setEnabled(false);
+                                    viewHolder.messageImageViewTwo.setEnabled(false);
+
+                                    ValueEventListener valueEventListener = new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                            viewLikeOne = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseOne").getValue(Integer.class);
+                                            viewLikeTwo = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseTwo").getValue(Integer.class);
+
+                                            Log.i(TAG,"help 2 " + viewLikeOne);
+                                            Log.i(TAG,"help 3 " + viewLikeTwo);
+
+                                            viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                                            viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    };
+
+                                    mFirebaseDatabaseReference.addValueEventListener(valueEventListener);
+
+
+                                }else {
+                                    viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(final View view) {
+
+                                            DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+                                                    .child(choose.getmKey()).child("chooseOne");
+                                            upvotes.runTransaction(new Transaction.Handler() {
+                                                @Override
+                                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                                    likeOne = mutableData.getValue(Integer.class);
+                                                    if (likeOne == null) {
+                                                        return Transaction.success(mutableData);
+                                                    }
+                                                    likeOne++;
+                                                    mutableData.setValue(likeOne);
+                                                    return Transaction.success(mutableData);
+
+                                                }
+
+                                                @Override
+                                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                                    Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                                                }
+                                            });
+
+                                            mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
+                                                    child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
+
+                                        }
+                                    });
+
+                                    viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(final View view) {
+
+                                            DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+                                                    .child(choose.getmKey()).child("chooseTwo");
+                                            upvotes.runTransaction(new Transaction.Handler() {
+                                                @Override
+                                                public Transaction.Result doTransaction(MutableData mutableData) {
+                                                    likeTwo = mutableData.getValue(Integer.class);
+                                                    if (likeTwo == null) {
+                                                        return Transaction.success(mutableData);
+                                                    }
+
+                                                    likeTwo++;
+                                                    mutableData.setValue(likeTwo);
+                                                    Log.i(TAG, "value vote: " + likeTwo);
+                                                    return Transaction.success(mutableData);
+
+                                                }
+
+                                                @Override
+                                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                                    Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                                                }
+                                            });
+                                            mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
+                                                    child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
+
+                                        }
+                                    });
                                 }
 
-                                likeTwo++;
-                                mutableData.setValue(likeTwo);
-                                Log.i(TAG, "value vote: " + likeTwo);
-                                return Transaction.success(mutableData);
-
-
                             }
 
                             @Override
-                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                                Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                            public void onCancelled(DatabaseError databaseError) {
+
                             }
-                        });
+                        };
 
-
+                        mFirebaseDatabaseReference.addValueEventListener(valueEventListenerm);
                     }
-                });
-
-                ValueEventListener valueEventListenerOne = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                        int likeone = dataSnapshot.child(MESSAGES_CHILD).child(choose.getId()).child("chooseOne").getValue(Integer.class);
-
-                        viewHolder.countViewOne.setText("За первое фото проголосавали: "  +  likeone);
-                        Log.i(TAG, "value votee: "  + likeone);
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                };
-
-                ValueEventListener valueEventListenerTwo = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        int liketwo = dataSnapshot.child(MESSAGES_CHILD).child(choose.getId()).child("chooseTwo").getValue(Integer.class);
-
-
-                        viewHolder.countViewTwo.setText("За второе фото проголосавали: "  +  liketwo);
-                        Log.i(TAG, "value votee: "  + liketwo);
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                };
-
-                mFirebaseDatabaseReference.addValueEventListener(valueEventListenerOne);
-                mFirebaseDatabaseReference.addValueEventListener(valueEventListenerTwo);
-
 
                 viewHolder.messengerTextView.setText(choose.getNameUser());
                 if (choose.getPhotoUrl() == null) {

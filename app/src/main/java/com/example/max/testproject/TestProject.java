@@ -12,6 +12,7 @@ import java.util.Map;
 public class TestProject {
 
     private String id;
+    private String mKey;
     private String yourChoose;
     private String nameUser;
     private String photoUrl;
@@ -21,21 +22,26 @@ public class TestProject {
     private int chooseTwo;
 
 
-
-
     public TestProject(){}
 
 
-
-    public TestProject(String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo , int chooseOne , int chooseTwo) {
+    public TestProject(String id,String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo , int chooseOne , int chooseTwo) {
         this.yourChoose = yourChoose;
+        this.id = id;
         this.nameUser = nameUser;
         this.photoUrl = photoUrl;
         this.imageUrlOne = imageUrlOne;
         this.imageUrlTwo = imageUrlTwo;
         this.chooseOne = chooseOne;
         this.chooseTwo = chooseTwo;
+    }
 
+    public String getmKey() {
+        return mKey;
+    }
+
+    public void setmKey(String mKey) {
+        this.mKey = mKey;
     }
 
     public String getId() {

@@ -124,7 +124,7 @@ public class AddImage extends MainActivity
                 return;
             }
 
-            final TestProject upload = new TestProject(mEditText.getText().toString()
+            final TestProject upload = new TestProject(mFirebaseUser.getUid(),mEditText.getText().toString()
                     ,mUsername
                     ,mPhotoUrl
                     ,downloadUrlOne
