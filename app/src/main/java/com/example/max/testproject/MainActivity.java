@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     private static final String TAG = "MainActivity";
     public static final String MESSAGES_CHILD = "choose";
     public static final String ANONYMOUS = "anonymous";
@@ -85,10 +87,8 @@ public class MainActivity extends AppCompatActivity
     public SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
 
-    Integer likeOne;
-    Integer likeTwo;
-    private static Integer viewLikeOne;
-    private static Integer viewLikeTwo;
+    private static Integer viewLikeOne,viewLikeTwo;
+    Integer likeOne,likeTwo;
 
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -111,6 +111,28 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_add_choose_page:
+                        Intent addChoose = new Intent(MainActivity.this,AddImage.class);
+                        startActivity(addChoose);
+                        break;
+                    case R.id.navigation_tape_page:
+                        Intent tapePage = new Intent(MainActivity.this,MainActivity.class);
+                        startActivity(tapePage);
+                        break;
+                    case R.id.navigation_home_page:
+                        Intent homePage = new Intent(MainActivity.this,UserActivity.class);
+                        startActivity(homePage);
+                        break;
+                }
+                return false;
+            }
+        });
 
         mUsername = ANONYMOUS;
 
@@ -216,32 +238,13 @@ public class MainActivity extends AppCompatActivity
 
                     if (mUserId.equals(choose.getId())){
 
-                        ValueEventListener valueEventListener = new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                        viewLikeOne = choose.getChooseOne();
+                        viewLikeTwo = choose.getChooseTwo();
 
-                                viewLikeOne = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseOne").getValue(Integer.class);
-                                viewLikeTwo = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseTwo").getValue(Integer.class);
-
-                                Log.i(TAG,"help 2 " + viewLikeOne);
-                                Log.i(TAG,"help 3 " + viewLikeTwo);
-
-                                viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
-                                viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        };
-
-                        mFirebaseDatabaseReference.addValueEventListener(valueEventListener);
+                        viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                        viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
 
                     }else {
-
-                        Log.i(TAG,"help 4 " + nameUser);
 
                         ValueEventListener valueEventListenerm = new ValueEventListener() {
                             @Override
@@ -250,40 +253,19 @@ public class MainActivity extends AppCompatActivity
                                 nameUser = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers")
                                         .child(mFirebaseAuth.getCurrentUser().getDisplayName()).getValue(String.class);
 
-                                Log.i(TAG,"help 1 " + nameUser);
-
                                 if (mFirebaseUser.getUid().equals(nameUser)){
-
-                                    Log.i(TAG,"help 5 " + nameUser);
 
                                     viewHolder.messageImageViewOne.setEnabled(false);
                                     viewHolder.messageImageViewTwo.setEnabled(false);
 
-                                    ValueEventListener valueEventListener = new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                    viewLikeOne = choose.getChooseOne();
+                                    viewLikeTwo = choose.getChooseTwo();
 
-                                            viewLikeOne = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseOne").getValue(Integer.class);
-                                            viewLikeTwo = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("chooseTwo").getValue(Integer.class);
-
-                                            Log.i(TAG,"help 2 " + viewLikeOne);
-                                            Log.i(TAG,"help 3 " + viewLikeTwo);
-
-                                            viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
-                                            viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    };
-
-                                    mFirebaseDatabaseReference.addValueEventListener(valueEventListener);
-
+                                    viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                                    viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
 
                                 }else {
+
                                     viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(final View view) {
@@ -311,7 +293,6 @@ public class MainActivity extends AppCompatActivity
 
                                             mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
                                                     child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
-
                                         }
                                     });
 
@@ -347,12 +328,11 @@ public class MainActivity extends AppCompatActivity
                                         }
                                     });
                                 }
-
                             }
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-
+                                Log.w(TAG,"Error, in update DB");
                             }
                         };
 
@@ -368,7 +348,6 @@ public class MainActivity extends AppCompatActivity
                             .load(choose.getPhotoUrl())
                             .into(viewHolder.messengerImageView);
                 }
-
             }
         };
 

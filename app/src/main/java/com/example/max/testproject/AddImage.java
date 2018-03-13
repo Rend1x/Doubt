@@ -6,11 +6,13 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.design.widget.BottomNavigationView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -59,11 +61,35 @@ public class AddImage extends MainActivity
     private StorageTask uploadTaskTwo;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_add_image);
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_add_choose_page:
+                        Intent addChoose = new Intent(AddImage.this,AddImage.class);
+                        startActivity(addChoose);
+                        break;
+                    case R.id.navigation_tape_page:
+                        Intent tapePage = new Intent(AddImage.this,MainActivity.class);
+                        startActivity(tapePage);
+                        break;
+                    case R.id.navigation_home_page:
+                        Intent homePage = new Intent(AddImage.this,UserActivity.class);
+                        startActivity(homePage);
+                        break;
+                }
+                return false;
+            }
+        });
 
         mImageViewOne = (ImageView) findViewById(R.id.image_one);
         mImageViewTwo = (ImageView) findViewById(R.id.image_two);

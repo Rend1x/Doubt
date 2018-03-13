@@ -32,7 +32,6 @@ public class SingInActivity extends AppCompatActivity implements
 
     private GoogleApiClient mGoogleApiClient;
 
-
     private FirebaseAuth mFirebaseAuth;
 
     @Override

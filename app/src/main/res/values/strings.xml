@@ -1,9 +1,16 @@
 <resources>
-    <string name="app_name">TestProject</string>
+    <string name="app_name">Doubt</string>
     <string name="sign_in">Присоединиться к Choose</string>
     <string name="sign_out">Выход</string>
 
-    <string name="title_activity_add_image">AddImage</string>
+    <string name="title_activity_add_image">Doubt</string>
     <string name="sendButton">Поделиться</string>
     <string name="hint_edit">Пиши здесь</string>
+
+    <string name="title_activity_user">UserActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_full_image">FullImageActivity</string>
+
 </resources>

@@ -17,20 +17,24 @@
 
     <ImageView
         android:id="@+id/image_one"
-        android:layout_width="150dp"
-        android:layout_height="220dp"
+        android:layout_width="192dp"
+        android:layout_height="300dp"
         android:layout_gravity="center|top"
         android:layout_marginBottom="62dp"
         android:layout_marginEnd="44dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:adjustViewBounds="false"
         android:cropToPadding="false"
+        android:scaleType="fitXY"
         android:src="@drawable/add_image_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/image_two"
         app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messageEditText"
+        app:layout_constraintVertical_bias="0.656"
         tools:ignore="MissingConstraints" />
 
     <EditText
@@ -38,10 +42,13 @@
         android:layout_width="384dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="171dp"
+        android:layout_marginTop="184dp"
         android:layout_weight="1.0"
         android:hint="@string/hint_edit"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
@@ -49,15 +56,17 @@
 
     <ImageView
         android:id="@+id/image_two"
-        android:layout_width="150dp"
-        android:layout_height="220dp"
+        android:layout_width="192dp"
+        android:layout_height="300dp"
         android:layout_gravity="center|top"
         android:layout_marginEnd="16dp"
+        android:scaleType="fitXY"
         android:src="@drawable/add_image_button"
         app:layout_constraintBottom_toBottomOf="@+id/image_one"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/image_one"
         app:layout_constraintTop_toTopOf="@+id/image_one"
+        app:layout_constraintVertical_bias="0.0"
         tools:ignore="MissingConstraints" />
 
 
@@ -70,13 +79,28 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:onClick="handleUploadChoose"
         android:text="@string/sendButton"
         app:layout_constraintBottom_toTopOf="@+id/messageEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="wrap_content"
+        android:layout_height="63dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        android:foregroundGravity="bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/menu_bottom_nav" />
 
 
 </android.support.constraint.ConstraintLayout>
