@@ -9,26 +9,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/FullscreenTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SingInActivity" />
+        <activity android:name=".activities.SingInActivity" />
         <activity
-            android:name=".AddImage"
+            android:name=".activities.AddImage"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_add_image"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".UserActivity"
+            android:name=".activities.UserActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_user"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".FullImageActivity"
+            android:name=".activities.FullImageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_image"
             android:theme="@style/FullscreenTheme"></activity>

@@ -1,16 +1,13 @@
-package com.example.max.testproject;
+package com.example.max.testproject.activities;
 
 
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,10 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.max.testproject.R;
+import com.example.max.testproject.model.TestProject;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
@@ -29,26 +26,18 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class UserActivity extends MainActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private RecyclerView mUserRecyclerView;
-    private LinearLayoutManager mLinearLayoutManager;
     private static final String TAG = "UserActivity";
     private TextView nameUser;
     private ImageView imageUser;
-    private TextView helpView;
-    private TestProject chooose;
+    DatabaseReference userRef;
 
     public FirebaseRecyclerAdapter<TestProject, UserViewHolder>
             mFirebaseAdapterUser;
@@ -119,17 +108,16 @@ public class UserActivity extends MainActivity implements GoogleApiClient.OnConn
             @Override
             public TestProject parseSnapshot(DataSnapshot dataSnapshot) {
                 TestProject choose = dataSnapshot.getValue(TestProject.class);
-                if (choose != null) {
+                if (choose != null && mFirebaseUser.getUid().equals(choose.getId())) {
                     choose.setmKey(dataSnapshot.getKey());
                 }
                 return choose;
             }
         };
-
-        DatabaseReference messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD);
+        userRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD);
         FirebaseRecyclerOptions<TestProject> options =
                 new FirebaseRecyclerOptions.Builder<TestProject>()
-                        .setQuery(messagesRef, parser)
+                        .setQuery(userRef,parser)
                         .build();
 
         mFirebaseAdapterUser = new FirebaseRecyclerAdapter<TestProject, UserActivity.UserViewHolder>(options) {

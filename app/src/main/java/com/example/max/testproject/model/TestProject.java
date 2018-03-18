@@ -1,4 +1,4 @@
-package com.example.max.testproject;
+package com.example.max.testproject.model;
 
 
 import android.net.Uri;

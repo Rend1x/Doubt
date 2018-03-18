@@ -1,6 +1,5 @@
-package com.example.max.testproject;
+package com.example.max.testproject.activities;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -18,14 +17,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.example.max.testproject.R;
+import com.example.max.testproject.model.TestProject;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
@@ -33,7 +32,6 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -118,15 +116,15 @@ public class MainActivity extends AppCompatActivity
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_add_choose_page:
-                        Intent addChoose = new Intent(MainActivity.this,AddImage.class);
+                        Intent addChoose = new Intent(MainActivity.this, AddImage.class);
                         startActivity(addChoose);
                         break;
                     case R.id.navigation_tape_page:
-                        Intent tapePage = new Intent(MainActivity.this,MainActivity.class);
+                        Intent tapePage = new Intent(MainActivity.this, MainActivity.class);
                         startActivity(tapePage);
                         break;
                     case R.id.navigation_home_page:
-                        Intent homePage = new Intent(MainActivity.this,UserActivity.class);
+                        Intent homePage = new Intent(MainActivity.this, UserActivity.class);
                         startActivity(homePage);
                         break;
                 }
@@ -209,6 +207,7 @@ public class MainActivity extends AppCompatActivity
                                     String downloadUrlOne = task.getResult().toString();
                                     Picasso.with(viewHolder.messageImageViewOne.getContext())
                                             .load(downloadUrlOne)
+                                            .fit()
                                             .placeholder(R.mipmap.ic_launcher)
                                             .into(viewHolder.messageImageViewOne);
 
@@ -227,6 +226,7 @@ public class MainActivity extends AppCompatActivity
                             String downloadUrlTwo = task.getResult().toString();
                             Picasso.with(viewHolder.messageImageViewTwo.getContext())
                                     .load(downloadUrlTwo)
+                                    .fit()
                                     .placeholder(R.mipmap.ic_launcher)
                                     .into(viewHolder.messageImageViewTwo);
                         } else {
@@ -236,108 +236,108 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-                    if (mUserId.equals(choose.getId())){
+                if (mUserId.equals(choose.getId())) {
 
-                        viewLikeOne = choose.getChooseOne();
-                        viewLikeTwo = choose.getChooseTwo();
+                    viewLikeOne = choose.getChooseOne();
+                    viewLikeTwo = choose.getChooseTwo();
 
-                        viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
-                        viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
+                    viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                    viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
 
-                    }else {
+                } else {
 
-                        ValueEventListener valueEventListenerm = new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                    ValueEventListener valueEventListenerm = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                nameUser = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers")
-                                        .child(mFirebaseAuth.getCurrentUser().getDisplayName()).getValue(String.class);
+                            nameUser = dataSnapshot.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers")
+                                    .child(mFirebaseAuth.getCurrentUser().getDisplayName()).getValue(String.class);
 
-                                if (mFirebaseUser.getUid().equals(nameUser)){
+                            if (mFirebaseUser.getUid().equals(nameUser)) {
 
-                                    viewHolder.messageImageViewOne.setEnabled(false);
-                                    viewHolder.messageImageViewTwo.setEnabled(false);
+                                viewHolder.messageImageViewOne.setEnabled(false);
+                                viewHolder.messageImageViewTwo.setEnabled(false);
 
-                                    viewLikeOne = choose.getChooseOne();
-                                    viewLikeTwo = choose.getChooseTwo();
+                                viewLikeOne = choose.getChooseOne();
+                                viewLikeTwo = choose.getChooseTwo();
 
-                                    viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
-                                    viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
+                                viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                                viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
 
-                                }else {
+                            } else {
 
-                                    viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(final View view) {
+                                viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(final View view) {
 
-                                            DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
-                                                    .child(choose.getmKey()).child("chooseOne");
-                                            upvotes.runTransaction(new Transaction.Handler() {
-                                                @Override
-                                                public Transaction.Result doTransaction(MutableData mutableData) {
-                                                    likeOne = mutableData.getValue(Integer.class);
-                                                    if (likeOne == null) {
-                                                        return Transaction.success(mutableData);
-                                                    }
-                                                    likeOne++;
-                                                    mutableData.setValue(likeOne);
+                                        DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+                                                .child(choose.getmKey()).child("chooseOne");
+                                        upvotes.runTransaction(new Transaction.Handler() {
+                                            @Override
+                                            public Transaction.Result doTransaction(MutableData mutableData) {
+                                                likeOne = mutableData.getValue(Integer.class);
+                                                if (likeOne == null) {
                                                     return Transaction.success(mutableData);
-
                                                 }
+                                                likeOne++;
+                                                mutableData.setValue(likeOne);
+                                                return Transaction.success(mutableData);
 
-                                                @Override
-                                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                                                    Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
-                                                }
-                                            });
+                                            }
 
-                                            mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
-                                                    child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
-                                        }
-                                    });
+                                            @Override
+                                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                                Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                                            }
+                                        });
 
-                                    viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(final View view) {
+                                        mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
+                                                child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
+                                    }
+                                });
 
-                                            DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
-                                                    .child(choose.getmKey()).child("chooseTwo");
-                                            upvotes.runTransaction(new Transaction.Handler() {
-                                                @Override
-                                                public Transaction.Result doTransaction(MutableData mutableData) {
-                                                    likeTwo = mutableData.getValue(Integer.class);
-                                                    if (likeTwo == null) {
-                                                        return Transaction.success(mutableData);
-                                                    }
+                                viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(final View view) {
 
-                                                    likeTwo++;
-                                                    mutableData.setValue(likeTwo);
-                                                    Log.i(TAG, "value vote: " + likeTwo);
+                                        DatabaseReference upvotes = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+                                                .child(choose.getmKey()).child("chooseTwo");
+                                        upvotes.runTransaction(new Transaction.Handler() {
+                                            @Override
+                                            public Transaction.Result doTransaction(MutableData mutableData) {
+                                                likeTwo = mutableData.getValue(Integer.class);
+                                                if (likeTwo == null) {
                                                     return Transaction.success(mutableData);
-
                                                 }
 
-                                                @Override
-                                                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                                                    Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
-                                                }
-                                            });
-                                            mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
-                                                    child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
+                                                likeTwo++;
+                                                mutableData.setValue(likeTwo);
+                                                Log.i(TAG, "value vote: " + likeTwo);
+                                                return Transaction.success(mutableData);
 
-                                        }
-                                    });
-                                }
+                                            }
+
+                                            @Override
+                                            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                                                Toast.makeText(MainActivity.this, "Голос ушел, все ок!!!", Toast.LENGTH_SHORT);
+                                            }
+                                        });
+                                        mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(choose.getmKey()).child("VotesUSers").
+                                                child(mFirebaseAuth.getCurrentUser().getDisplayName()).setValue(mFirebaseUser.getUid());
+
+                                    }
+                                });
                             }
+                        }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Log.w(TAG,"Error, in update DB");
-                            }
-                        };
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w(TAG, "Error, in update DB");
+                        }
+                    };
 
-                        mFirebaseDatabaseReference.addValueEventListener(valueEventListenerm);
-                    }
+                    mFirebaseDatabaseReference.addValueEventListener(valueEventListenerm);
+                }
 
                 viewHolder.messengerTextView.setText(choose.getNameUser());
                 if (choose.getPhotoUrl() == null) {

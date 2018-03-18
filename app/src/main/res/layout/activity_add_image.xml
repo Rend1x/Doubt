@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ddd"
-    tools:context="com.example.max.testproject.AddImage"
+    tools:context="com.example.max.testproject.activities.AddImage"
     tools:layout_editor_absoluteY="25dp">
 
 
@@ -88,7 +88,7 @@
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="63dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
