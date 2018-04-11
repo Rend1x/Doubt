@@ -31,7 +31,13 @@
             android:name=".activities.FullImageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_image"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_settings"
             android:theme="@style/FullscreenTheme"></activity>
+        <activity android:name=".adapter.PostListAdapter" />
     </application>
 
 </manifest>

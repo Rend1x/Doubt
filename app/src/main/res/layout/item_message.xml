@@ -20,7 +20,7 @@
             android:src="@drawable/ic_account_circle_black_36dp" />
 
         <TextView
-            android:id="@+id/messengerTextView"
+            android:id="@+id/userNameTextView"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center|top|left"
@@ -71,8 +71,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="400dp"
                         android:layout_gravity="center|bottom"
-                        android:adjustViewBounds="true"
-                        />
+                        android:adjustViewBounds="true" />
 
                 </LinearLayout>
 
@@ -86,8 +85,7 @@
                         android:id="@+id/messageImageViewTwo"
                         android:layout_width="match_parent"
                         android:layout_height="400dp"
-                        android:adjustViewBounds="true"
-                         />
+                        android:adjustViewBounds="true" />
 
                 </LinearLayout>
 

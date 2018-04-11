@@ -1,15 +1,6 @@
 package com.example.max.testproject.model;
 
-
-import android.net.Uri;
-
-import com.google.firebase.database.Exclude;
-
-import java.util.HashMap;
-import java.util.Map;
-
-
-public class TestProject {
+public class Doubt extends PostID{
 
     private String id;
     private String mKey;
@@ -21,11 +12,11 @@ public class TestProject {
     private int chooseOne;
     private int chooseTwo;
 
+    public Doubt() {
+    }
 
-    public TestProject(){}
 
-
-    public TestProject(String id,String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo , int chooseOne , int chooseTwo) {
+    public Doubt(String id, String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo, int chooseOne, int chooseTwo) {
         this.yourChoose = yourChoose;
         this.id = id;
         this.nameUser = nameUser;
@@ -80,7 +71,7 @@ public class TestProject {
         return imageUrlOne;
     }
 
-    public  String getImageUrlTwo(){
+    public String getImageUrlTwo() {
         return imageUrlTwo;
     }
 
@@ -88,7 +79,7 @@ public class TestProject {
         this.imageUrlOne = imageUrlOne;
     }
 
-    public void setImageUrlTwo(String imageUrlTwo){
+    public void setImageUrlTwo(String imageUrlTwo) {
         this.imageUrlTwo = imageUrlTwo;
     }
 

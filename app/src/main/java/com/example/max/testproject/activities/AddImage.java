@@ -15,18 +15,15 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.max.testproject.R;
+import com.example.max.testproject.model.Doubt;
 import com.example.max.testproject.utils.StringUtils;
-import com.example.max.testproject.model.TestProject;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -73,15 +70,15 @@ public class AddImage extends MainActivity
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_add_choose_page:
-                        Intent addChoose = new Intent(AddImage.this,AddImage.class);
+                        Intent addChoose = new Intent(AddImage.this, AddImage.class);
                         startActivity(addChoose);
                         break;
                     case R.id.navigation_tape_page:
-                        Intent tapePage = new Intent(AddImage.this,MainActivity.class);
+                        Intent tapePage = new Intent(AddImage.this, MainActivity.class);
                         startActivity(tapePage);
                         break;
                     case R.id.navigation_home_page:
-                        Intent homePage = new Intent(AddImage.this,UserActivity.class);
+                        Intent homePage = new Intent(AddImage.this, UserActivity.class);
                         startActivity(homePage);
                         break;
                 }
@@ -92,98 +89,62 @@ public class AddImage extends MainActivity
         mImageViewOne = (ImageView) findViewById(R.id.image_one);
         mImageViewTwo = (ImageView) findViewById(R.id.image_two);
         mSendButton = (Button) findViewById(R.id.sendButton);
-        mEditText =(EditText) findViewById(R.id.messageEditText);
+        mEditText = (EditText) findViewById(R.id.messageEditText);
 
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference(mFirebaseUser.getUid());
-        mFirebaseDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null){
-                    return;
-                }
-                Map<String, Object> updatedFlower = (Map<String, Object>) dataSnapshot.getValue();
-                Log.i(TAG, "updatedFlower = " + updatedFlower.toString());
-            }
 
+        mImageViewOne.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.i(TAG, "onCancelled");
+            public void onClick(View view) {
+                Intent pickerPhotoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickerPhotoIntent, Image_Request_Code_One);
             }
         });
-    mImageViewOne.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Intent pickerPhotoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(pickerPhotoIntent, Image_Request_Code_One);
-        }
-    });
 
-    mImageViewTwo.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Intent pickerPhotoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(pickerPhotoIntent, Image_Request_Code_Two);
-        }
-    });
-
-    mSendButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-            if (uploadTaskOne != null && uploadTaskOne.isInProgress() && uploadTaskTwo != null && uploadTaskTwo.isInProgress()){
-                Toast.makeText(AddImage.this,"Uploading",Toast.LENGTH_SHORT);
-
-            }else{
-            if (TextUtils.isEmpty(mEditText.getText().toString())){
-                Toast.makeText(AddImage.this,"Your choose null",Toast.LENGTH_SHORT);
-                return;
+        mImageViewTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent pickerPhotoIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickerPhotoIntent, Image_Request_Code_Two);
             }
-            if (mImageViewOne.getDrawable()==null){
-                Toast.makeText(AddImage.this,"You must select image",Toast.LENGTH_SHORT);
-                return;
-            }
-            if (mImageViewTwo.getDrawable()==null){
-                Toast.makeText(AddImage.this,"You must select image",Toast.LENGTH_SHORT);
-                return;
-            }
+        });
 
-            final TestProject upload = new TestProject(mFirebaseUser.getUid(),mEditText.getText().toString()
-                    ,mUsername
-                    ,mPhotoUrl
-                    ,downloadUrlOne
-                    ,downloadUrlTwo,0,0);
-            mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
-                    .setValue(upload, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(DatabaseError databaseError,
-                                               DatabaseReference databaseReference) {
-                            if (databaseError == null) {
-                                String key = databaseReference.child(MESSAGES_CHILD).getParent().getKey();
-                                StorageReference storageReference =
-                                        FirebaseStorage.getInstance()
-                                                .getReference(mFirebaseUser.getUid())
-                                                .child(key)
-                                                .child(mFirebaseUriOne.getLastPathSegment())
-                                                .child(mFirebaseUriTwo.getLastPathSegment());
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-                            } else {
-                                Log.w(TAG, "Unable to write message to database.",
-                                        databaseError.toException());
-                            }
-                            if (upload != null){
-                                Intent backToActivity = new Intent(AddImage.this, MainActivity.class);
-                                startActivity(backToActivity);
-                                finish();
-                            }
-                        }
-                    });
-            Toast.makeText(AddImage.this,"Upload your choose",Toast.LENGTH_SHORT);
+                if (TextUtils.isEmpty(mEditText.getText().toString())) {
+                    Toast.makeText(AddImage.this, "Your choose null", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if (mImageViewOne.getDrawable() == null) {
+                    Toast.makeText(AddImage.this, "You must select image", Toast.LENGTH_SHORT);
+                    return;
+                }
+                if (mImageViewTwo.getDrawable() == null) {
+                    Toast.makeText(AddImage.this, "You must select image", Toast.LENGTH_SHORT);
+                    return;
+                }
+
+                Doubt upload = new Doubt(mFirebaseUser.getUid(), mEditText.getText().toString()
+                        , mUsername
+                        , mPhotoUrl
+                        , downloadUrlOne
+                        , downloadUrlTwo, 0, 0);
+
+                mFirestore.collection(MESSAGES_CHILD).add(upload);
+
+                if (upload != null) {
+                    Intent backToActivity = new Intent(AddImage.this, MainActivity.class);
+                    startActivity(backToActivity);
+                    finish();
+                }
+                Toast.makeText(AddImage.this, "Upload your choose", Toast.LENGTH_SHORT);
             }
-        }
-    });
+        });
+
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

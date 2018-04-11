@@ -11,14 +11,16 @@ import com.squareup.picasso.Picasso;
 
 public class FullImageActivity extends MainActivity {
 
-    private TextView chooseCountTwoUser,chooseCountOneUser,userTextView,userNameTextView;
-    private ImageView userImageViewOne,userImageViewTwo,imageUser;
+    private TextView chooseCountTwoUser, chooseCountOneUser, userTextView, userNameTextView;
+    private ImageView userImageViewOne, userImageViewTwo, imageUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_full_image);
+
+
 
         userNameTextView = (TextView) findViewById(R.id.userNameTextView);
         userTextView = (TextView) findViewById(R.id.userTextView);
@@ -40,7 +42,6 @@ public class FullImageActivity extends MainActivity {
         String imageURLTwo = intent.getExtras().getString("Image Two");
 
 
-
         if (mFirebaseUser.getPhotoUrl() == null) {
             imageUser.setImageDrawable(ContextCompat.getDrawable(FullImageActivity.this,
                     R.drawable.ic_account_circle_black_36dp));
@@ -49,14 +50,21 @@ public class FullImageActivity extends MainActivity {
                     .load(mFirebaseUser.getPhotoUrl())
                     .into(imageUser);
         }
+
         userNameTextView.setText(UserName);
         userTextView.setText(Choose);
         chooseCountOneUser.setText("За первое фото проголосавали: " + countLikeOne);
         chooseCountTwoUser.setText("За первое фото проголосавали: " + countLikeTwo);
 
-        Picasso.with(userImageViewOne.getContext()).load(imageURLOne).into(userImageViewOne);
-        Picasso.with(userImageViewTwo.getContext()).load(imageURLTwo).into(userImageViewTwo);
+        Picasso.with(userImageViewOne.getContext())
+                .load(imageURLOne)
+                .fit()
+                .into(userImageViewOne);
+
+        Picasso.with(userImageViewTwo.getContext())
+                .load(imageURLTwo)
+                .fit()
+                .into(userImageViewTwo);
 
     }
-
 }

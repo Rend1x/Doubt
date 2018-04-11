@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cardview_id"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:layout_width="120dp"
-    android:layout_height="190dp"
+    android:layout_height="120dp"
     xmlns:cardview="http://schemas.android.com/apk/res-auto"
     android:layout_margin="5dp"
     cardview:cardCornerRadius="4dp">
@@ -24,9 +23,8 @@
             <ImageView
                 android:id="@+id/image_user_one"
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:scaleType="centerCrop"
-                android:background="#2d2d2d"/>
+                android:layout_height="120dp"
+                android:background="#2d2d2d" />
 
         </LinearLayout>
 
@@ -38,9 +36,8 @@
             <ImageView
                 android:id="@+id/image_user_two"
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:scaleType="centerCrop"
-                android:background="#2d2d2d"/>
+                android:layout_height="120dp"
+                android:background="#2d2d2d" />
 
         </LinearLayout>
     </LinearLayout>
