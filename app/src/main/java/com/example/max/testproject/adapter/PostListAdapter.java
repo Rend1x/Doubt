@@ -55,7 +55,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
 
 
     public PostListAdapter(Context context,List<Doubt> postUsers){
-
         this.postUsers = postUsers;
         this.context = context;
     }
@@ -72,9 +71,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         currentUser = mFirebaseUser.getDisplayName();
+        mFirestore = FirebaseFirestore.getInstance();
 
         final String post_Id = postUsers.get(position).postId;
-
 
         viewHolder.messageTextView.setText(postUsers.get(position).getYourChoose());
 
@@ -121,6 +120,10 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
             }
         });
 
+        Log.d(TAG,"id usr 1 " + mFirebaseUser.getUid());
+
+        Log.d(TAG,"id usr 2 " + postUsers.get(position).getId());
+
         if (mFirebaseUser.getUid().equals(postUsers.get(position).getId())){
 
             viewLikeOne = postUsers.get(position).getChooseOne();
@@ -130,69 +133,97 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
             viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
 
         }else {
+
+            final DocumentReference documentReference = mFirestore.collection(MESSAGES_CHILD)
+                    .document(post_Id).collection("VotesUsers_"+post_Id).document(currentUser);
+
+            documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+
+                        nameUser = documentSnapshot.getString(currentUser);
+
+                        Log.d(TAG, "Name USer " + nameUser);
+
+
+                        if (mFirebaseUser.getUid().equals(nameUser)){
+
+                            Log.d(TAG,"Name USer 1 " + nameUser);
+
+                            viewHolder.messageImageViewOne.setEnabled(false);
+                            viewHolder.messageImageViewTwo.setEnabled(false);
+
+                            viewLikeOne = postUsers.get(position).getChooseOne();
+                            viewLikeTwo = postUsers.get(position).getChooseTwo();
+
+                            viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
+                            viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
+
+                        }else {
+
+                            viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(final View view) {
+
+
+                                    final DocumentReference documentReference = mFirestore.collection(MESSAGES_CHILD).document(post_Id);
+
+                                    mFirestore.runTransaction(new Transaction.Function<Double>() {
+                                        @Override
+                                        public Double apply (Transaction transaction)  throws FirebaseFirestoreException {
+
+                                            DocumentSnapshot snapshot = transaction.get(documentReference);
+
+                                            Double newCountLike = snapshot.getDouble("chooseOne") + 1;
+
+                                            transaction.update(documentReference,"chooseOne",newCountLike);
+
+                                            return newCountLike;
+
+                                        }
+
+                                    });
+                                    Map<String,Object> likeMap = new HashMap<>();
+                                    likeMap.put(currentUser,mFirebaseUser.getUid());
+
+                                    mFirestore.collection(MESSAGES_CHILD).document(post_Id).collection("VotesUsers_"+post_Id)
+                                            .document(currentUser).set(likeMap);
+                                }
+                            });
+
+//                            viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(final View view) {
 //
-//            final DocumentReference documentReference = mFirestore.collection("VotesUsers").document(currentUser);
 //
-//            documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                @Override
-//                public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-//                    if (documentSnapshot != null && documentSnapshot.exists()){
+//                                    final DocumentReference documentReference = mFirestore.collection(MESSAGES_CHILD).document(post_Id);
 //
-//                       nameUser = documentSnapshot.getString(currentUser);
+//                                    mFirestore.runTransaction(new Transaction.Function<Double>() {
+//                                        @Override
+//                                        public Double apply (Transaction transaction)  throws FirebaseFirestoreException {
 //
-//                       Log.d(TAG,"Name USer " + nameUser);
-//                    }
-//                }
-//            });
-//            Log.d(TAG,"Name USer1 " + nameUser);
-//            if (mFirebaseUser.getUid().equals(nameUser)){
+//                                            DocumentSnapshot snapshot = transaction.get(documentReference);
 //
-//                viewHolder.messageImageViewOne.setEnabled(false);
-//                viewHolder.messageImageViewTwo.setEnabled(false);
+//                                            Double newCountLike = snapshot.getDouble("chooseTwo") + 1;
 //
-//                viewLikeOne = postUsers.get(position).getChooseOne();
-//                viewLikeTwo = postUsers.get(position).getChooseTwo();
+//                                            transaction.update(documentReference,"chooseTwo",newCountLike);
 //
-//                viewHolder.countViewOne.setText("За первое фото проголосавали: " + viewLikeOne);
-//                viewHolder.countViewTwo.setText("За второе фото проголосавали: " + viewLikeTwo);
+//                                            return newCountLike;
 //
-//            }else {
-
-                viewHolder.messageImageViewOne.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View view) {
-
-                        Toast.makeText(context,"PostID = " + post_Id, Toast.LENGTH_SHORT).show();
-
-                        final DocumentReference documentReference = mFirestore.collection(MESSAGES_CHILD).document(post_Id);
-
-                        mFirestore.runTransaction(new Transaction.Function<Double>() {
-                            @Override
-                            public Double apply (Transaction transaction)  throws FirebaseFirestoreException {
-
-                                DocumentSnapshot snapshot = transaction.get(documentReference);
-
-                                Double newCountLike = snapshot.getDouble("chooseOne") + 1;
-
-                                transaction.update(documentReference,"chooseOne",newCountLike);
-
-                                return newCountLike;
-
-                            }
-
-                        });
-
-                        Map<String,Object> likeMap = new HashMap<>();
-                        likeMap.put(currentUser,mFirebaseUser.getUid());
-
-                        mFirestore.collection(MESSAGES_CHILD).document(post_Id).collection("VotesUsers")
-                                .document(currentUser).set(likeMap);
+//                                        }
+//
+//                                    });
+//                                    Map<String,Object> likeMap = new HashMap<>();
+//                                    likeMap.put(currentUser,mFirebaseUser.getUid());
+//
+//                                    mFirestore.collection(MESSAGES_CHILD).document(post_Id).collection("VotesUsers_"+post_Id)
+//                                            .document(currentUser).set(likeMap);
+//                                }
+//                            });
+                        }
                     }
-                });
-            // }
-
+            });
         }
-
 
         viewHolder.messengerTextView.setText(postUsers.get(position).getNameUser());
         if (postUsers.get(position).getPhotoUrl() == null) {

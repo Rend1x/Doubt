@@ -18,12 +18,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.max.testproject.R;
+import com.example.max.testproject.activities.filters.BeforeAfterActivity;
+import com.example.max.testproject.activities.filters.OneVsOneActivity;
+import com.example.max.testproject.activities.filters.OtherActivity;
 import com.example.max.testproject.adapter.PostListAdapter;
 import com.example.max.testproject.model.Doubt;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -58,17 +62,13 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
     public static final String MESSAGES_CHILD = "choose";
-    public static final String USER_CHILD = "my_post";
     public static final String ANONYMOUS = "anonymous";
 
     public String mUsername;
     public String nameUser;
-    public String mUserId;
     public String mPhotoUrl;
     public SharedPreferences mSharedPreferences;
     public GoogleApiClient mGoogleApiClient;
-
-    Integer likeOne,likeTwo;
 
     private List<Doubt> postUsers;
     public PostListAdapter postListAdapter;
@@ -81,14 +81,16 @@ public class MainActivity extends AppCompatActivity
     public FirebaseUser mFirebaseUser;
 
 
-    public ImageView messageImageViewOne;
-    public ImageView messageImageViewTwo;
+    private Button mOneVsOneMain;
+    private Button mBeforeAfterMain;
+    private Button mOtherMain;
 
     public FirebaseFirestore mFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -102,10 +104,12 @@ public class MainActivity extends AppCompatActivity
                         Intent addChoose = new Intent(MainActivity.this, AddImage.class);
                         startActivity(addChoose);
                         break;
+
                     case R.id.navigation_tape_page:
                         Intent tapePage = new Intent(MainActivity.this, MainActivity.class);
                         startActivity(tapePage);
                         break;
+
                     case R.id.navigation_home_page:
                         Intent homePage = new Intent(MainActivity.this, UserActivity.class);
                         startActivity(homePage);
@@ -136,18 +140,52 @@ public class MainActivity extends AppCompatActivity
                 .build();
 
 
-
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        messageImageViewOne = (ImageView) findViewById(R.id.messageImageViewOne);
-        messageImageViewTwo = (ImageView) findViewById(R.id.messageImageViewTwo);
         mFirestore = FirebaseFirestore.getInstance();
-
+        mOneVsOneMain = (Button) findViewById(R.id.oneVsOneMain);
+        mBeforeAfterMain = (Button) findViewById(R.id.beforeAfterMain);
+        mOtherMain = (Button) findViewById(R.id.otherMain);
         postUsers = new ArrayList<>();
         postListAdapter = new PostListAdapter(getApplicationContext(), postUsers);
         mMessageRecyclerView.setAdapter(postListAdapter);
+
+
+        mOneVsOneMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent oneVsOne = new Intent(MainActivity.this, OneVsOneActivity.class);
+                startActivity(oneVsOne);
+            }
+        });
+
+        mBeforeAfterMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent beforeAfter = new Intent(MainActivity.this, BeforeAfterActivity.class);
+                startActivity(beforeAfter);
+            }
+        });
+
+
+        mOtherMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent other = new Intent(MainActivity.this, OtherActivity.class);
+                startActivity(other);
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onStart(){
+
+        super.onStart();
+
 
         mFirestore.collection(MESSAGES_CHILD).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -169,7 +207,6 @@ public class MainActivity extends AppCompatActivity
 
                         postUsers.add(post);
 
-                        postListAdapter.notifyDataSetChanged();
 
                     }
                 }

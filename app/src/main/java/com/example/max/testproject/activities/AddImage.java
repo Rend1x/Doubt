@@ -38,8 +38,12 @@ public class AddImage extends MainActivity
 
     private static final int Image_Request_Code_One = 1;
     private static final int Image_Request_Code_Two = 2;
+    private int category = 0;
     private EditText mEditText;
     private Button mSendButton;
+    private Button mOneVsOne;
+    private Button mBeforeAfter;
+    private Button mOther;
     private ImageView mImageViewOne;
     private ImageView mImageViewTwo;
     private StorageReference storageReference;
@@ -90,6 +94,10 @@ public class AddImage extends MainActivity
         mImageViewTwo = (ImageView) findViewById(R.id.image_two);
         mSendButton = (Button) findViewById(R.id.sendButton);
         mEditText = (EditText) findViewById(R.id.messageEditText);
+        mOneVsOne = (Button) findViewById(R.id.oneVsOne);
+        mBeforeAfter = (Button) findViewById(R.id.beforeAfter);
+        mOther = (Button) findViewById(R.id.other);
+
 
         mFirestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference(mFirebaseUser.getUid());
@@ -110,37 +118,89 @@ public class AddImage extends MainActivity
             }
         });
 
+        /*
+        * Присвоение переменной category значение 1 (Выбранна категория 1 на 1 или лицом к лицу)
+        * */
+        mOneVsOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                category = 1;
+
+                Log.d(TAG,"category1: " + category);
+            }
+        });
+        /*
+         * Присвоение переменной category значение 2 (Выбранна категория до/после)
+         * */
+        mBeforeAfter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                category = 2;
+
+                Log.d(TAG,"category2: " + category);
+            }
+        });
+        /*
+         * Присвоение переменной category значение 3 (Выбранна категория разное)
+         * */
+        mOther.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                category = 3;
+
+                Log.d(TAG,"category3: " + category);
+            }
+        });
+
+        /*
+         * Отправка данных в базу данных
+         * Проверка данных на корректность перед отправкой
+         * Возврат на другую активность если данные заполнены корректно
+         * Если данные введены не корректно сообщение об ошибки или не заполнености даных
+         * */
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (TextUtils.isEmpty(mEditText.getText().toString())) {
-                    Toast.makeText(AddImage.this, "Your choose null", Toast.LENGTH_SHORT);
+                    Toast.makeText(AddImage.this, "Your choose null", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (mImageViewOne.getDrawable() == null) {
-                    Toast.makeText(AddImage.this, "You must select image", Toast.LENGTH_SHORT);
+                    Toast.makeText(AddImage.this, "You must select image", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (mImageViewTwo.getDrawable() == null) {
-                    Toast.makeText(AddImage.this, "You must select image", Toast.LENGTH_SHORT);
+                    Toast.makeText(AddImage.this, "You must select image", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                Doubt upload = new Doubt(mFirebaseUser.getUid(), mEditText.getText().toString()
-                        , mUsername
-                        , mPhotoUrl
-                        , downloadUrlOne
-                        , downloadUrlTwo, 0, 0);
 
-                mFirestore.collection(MESSAGES_CHILD).add(upload);
+                if (category == 0){
 
-                if (upload != null) {
-                    Intent backToActivity = new Intent(AddImage.this, MainActivity.class);
-                    startActivity(backToActivity);
-                    finish();
+                    Toast.makeText(AddImage.this,"Выберите категорию",Toast.LENGTH_LONG).show();
+
+                }else if(downloadUrlOne == null && downloadUrlTwo == null){
+
+                    Toast.makeText(AddImage.this,"Картинки загружаються",Toast.LENGTH_LONG).show();
+
+                    }else {
+
+                    Doubt upload = new Doubt(mFirebaseUser.getUid(), mEditText.getText().toString()
+                            , mUsername
+                            , mPhotoUrl
+                            , downloadUrlOne
+                            , downloadUrlTwo, 0, 0, category);
+
+                    mFirestore.collection(MESSAGES_CHILD).add(upload);
+
+                    if (upload != null) {
+                        Intent backToActivity = new Intent(AddImage.this, MainActivity.class);
+                        startActivity(backToActivity);
+                        finish();
+                    }
+                    Toast.makeText(AddImage.this, "Upload your choose", Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(AddImage.this, "Upload your choose", Toast.LENGTH_SHORT);
             }
         });
 
@@ -163,6 +223,10 @@ public class AddImage extends MainActivity
         }
     }
 
+
+    /*
+     * Загрузка картинок в Firebase Storange
+     * */
     private void uploadImageToFirebaseOne() {
 
         imageNameOne = StringUtils.getRandomString(20 ) + ".png";

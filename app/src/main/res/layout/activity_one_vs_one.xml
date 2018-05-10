@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#fff"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.max.testproject.activities.MainActivity"
+    tools:context="com.example.max.testproject.activities.filters.OneVsOneActivity"
     tools:layout_editor_absoluteY="25dp">
 
     <android.support.design.widget.BottomNavigationView
@@ -29,7 +29,7 @@
         app:menu="@menu/menu_bottom_nav" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/messageRecyclerView"
+        android:id="@+id/messageRecyclerViewOne"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
@@ -40,10 +40,10 @@
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintHorizontal_bias="1.0"
         ads:layout_constraintStart_toStartOf="parent"
-        ads:layout_constraintTop_toBottomOf="@+id/beforeAfterMain" />
+        ads:layout_constraintTop_toBottomOf="@+id/beforeAfterOne" />
 
     <Button
-        android:id="@+id/oneVsOneMain"
+        android:id="@+id/oneVsOneOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -52,19 +52,19 @@
         ads:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/beforeAfterMain"
+        android:id="@+id/beforeAfterOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="@string/beforeAfter"
-        ads:layout_constraintEnd_toStartOf="@+id/otherMain"
+        ads:layout_constraintEnd_toStartOf="@+id/otherOne"
         ads:layout_constraintHorizontal_bias="0.538"
-        ads:layout_constraintStart_toEndOf="@+id/oneVsOneMain"
+        ads:layout_constraintStart_toEndOf="@+id/oneVsOneOne"
         ads:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/otherMain"
+        android:id="@+id/otherOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"

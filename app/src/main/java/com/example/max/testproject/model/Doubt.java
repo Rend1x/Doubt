@@ -3,7 +3,6 @@ package com.example.max.testproject.model;
 public class Doubt extends PostID{
 
     private String id;
-    private String mKey;
     private String yourChoose;
     private String nameUser;
     private String photoUrl;
@@ -11,12 +10,15 @@ public class Doubt extends PostID{
     private String imageUrlTwo;
     private int chooseOne;
     private int chooseTwo;
+    private int category;
 
     public Doubt() {
     }
 
 
-    public Doubt(String id, String yourChoose, String nameUser, String photoUrl, String imageUrlOne, String imageUrlTwo, int chooseOne, int chooseTwo) {
+    public Doubt(String id, String yourChoose, String nameUser, String photoUrl
+            , String imageUrlOne, String imageUrlTwo
+            , int chooseOne, int chooseTwo, int category) {
         this.yourChoose = yourChoose;
         this.id = id;
         this.nameUser = nameUser;
@@ -25,14 +27,15 @@ public class Doubt extends PostID{
         this.imageUrlTwo = imageUrlTwo;
         this.chooseOne = chooseOne;
         this.chooseTwo = chooseTwo;
+        this.category = category;
     }
 
-    public String getmKey() {
-        return mKey;
+    public int getCategory() {
+        return category;
     }
 
-    public void setmKey(String mKey) {
-        this.mKey = mKey;
+    public void setCategory(int category) {
+        this.category = category;
     }
 
     public String getId() {

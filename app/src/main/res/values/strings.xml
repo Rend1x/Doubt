@@ -1,4 +1,6 @@
 <resources>
+
+
     <string name="app_name">Doubt</string>
     <string name="sign_in">Присоединиться к Doubt</string>
     <string name="sign_out">Выход</string>
@@ -12,6 +14,25 @@
     <string name="title_activity_full_image">FullImageActivity</string>
 
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
 
+    <string name="title_add">Добавить</string>
+    <string name="title_tap">Лента</string>
+    <string name="title_user">Профиль</string>
+
+    <string name="oneVsOne">Лицом к лицу</string>
+    <string name="beforeAfter">До/После</string>
+    <string name="other">Разное</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_activity_one_vs_one">OneVsOneActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_before_after">BeforeAfterActivity</string>
+
+    <string name="title_activity_other">OtherActivity</string>
 
 </resources>

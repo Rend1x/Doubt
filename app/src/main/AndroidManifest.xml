@@ -36,8 +36,23 @@
             android:name=".activities.SettingsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_settings"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
         <activity android:name=".adapter.PostListAdapter" />
+        <activity
+            android:name=".activities.filters.OneVsOneActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_one_vs_one"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activities.filters.BeforeAfterActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_before_after"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activities.filters.OtherActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_other"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>
