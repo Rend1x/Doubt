@@ -8,6 +8,7 @@ public class Doubt extends PostID{
     private String photoUrl;
     private String imageUrlOne;
     private String imageUrlTwo;
+    private String mKey;
     private int chooseOne;
     private int chooseTwo;
     private int category;
@@ -28,6 +29,14 @@ public class Doubt extends PostID{
         this.chooseOne = chooseOne;
         this.chooseTwo = chooseTwo;
         this.category = category;
+    }
+
+    public String getmKey() {
+        return mKey;
+    }
+
+    public void setmKey(String mKey) {
+        this.mKey = mKey;
     }
 
     public int getCategory() {

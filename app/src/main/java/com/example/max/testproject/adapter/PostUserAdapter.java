@@ -64,7 +64,6 @@ public class PostUserAdapter extends RecyclerView.Adapter<PostUserAdapter.ViewHo
                             Picasso.with(viewHolder.userImageOne.getContext())
                                     .load(downloadUrlOne)
                                     .fit()
-                                    .placeholder(R.mipmap.ic_launcher)
                                     .into(viewHolder.userImageOne);
 
                         } else {
@@ -83,7 +82,6 @@ public class PostUserAdapter extends RecyclerView.Adapter<PostUserAdapter.ViewHo
                     Picasso.with(viewHolder.userImageTwo.getContext())
                             .load(downloadUrlTwo)
                             .fit()
-                            .placeholder(R.mipmap.ic_launcher)
                             .into(viewHolder.userImageTwo);
                 } else {
                     Log.w(TAG, "Getting download url was not successful.",

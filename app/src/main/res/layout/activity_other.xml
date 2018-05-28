@@ -42,33 +42,35 @@
         ads:layout_constraintStart_toStartOf="parent"
         ads:layout_constraintTop_toBottomOf="@+id/beforeAfterOther" />
 
-    <Button
+    <ImageView
         android:id="@+id/oneVsOneOther"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:text="@string/oneVsOne"
+        android:src="@drawable/onevsone"
         ads:layout_constraintStart_toStartOf="parent"
         ads:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageView
         android:id="@+id/beforeAfterOther"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="@string/beforeAfter"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/before"
         ads:layout_constraintEnd_toStartOf="@+id/otherOther"
-        ads:layout_constraintHorizontal_bias="0.538"
+        ads:layout_constraintHorizontal_bias="0.465"
         ads:layout_constraintStart_toEndOf="@+id/oneVsOneOther"
         ads:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageView
         android:id="@+id/otherOther"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="@string/other"
+        android:layout_marginEnd="28dp"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/other"
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintTop_toTopOf="parent" />
 

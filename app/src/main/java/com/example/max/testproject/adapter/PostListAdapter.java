@@ -44,13 +44,14 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
 
 
     private static final String TAG = "PostListAdapter";
-    public List<Doubt> postUsers;
+    private List<Doubt> postUsers;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private String currentUser;
     private String nameUser;
     private static Integer viewLikeOne,viewLikeTwo;
-    public FirebaseFirestore mFirestore;
+    private Double newViewLikeOne,newViewLikeTwo;
+    private FirebaseFirestore mFirestore;
     private Context context;
 
 
@@ -90,7 +91,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
                             Picasso.with(viewHolder.messageImageViewOne.getContext())
                                     .load(downloadUrlOne)
                                     .fit()
-                                    .placeholder(R.mipmap.ic_launcher)
                                     .into(viewHolder.messageImageViewOne);
 
                         } else {
@@ -111,7 +111,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
                     Picasso.with(viewHolder.messageImageViewTwo.getContext())
                             .load(downloadUrlTwo)
                             .fit()
-                            .placeholder(R.mipmap.ic_launcher)
                             .into(viewHolder.messageImageViewTwo);
                 } else {
                     Log.w(TAG, "Getting download url was not successful.",
@@ -174,11 +173,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
 
                                             DocumentSnapshot snapshot = transaction.get(documentReference);
 
-                                            Double newCountLike = snapshot.getDouble("chooseOne") + 1;
+                                            newViewLikeOne = snapshot.getDouble("chooseOne") + 1;
 
-                                            transaction.update(documentReference,"chooseOne",newCountLike);
+                                            transaction.update(documentReference,"chooseOne",newViewLikeOne);
 
-                                            return newCountLike;
+                                            return newViewLikeOne;
 
                                         }
 
@@ -191,35 +190,35 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
                                 }
                             });
 
-//                            viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(final View view) {
-//
-//
-//                                    final DocumentReference documentReference = mFirestore.collection(MESSAGES_CHILD).document(post_Id);
-//
-//                                    mFirestore.runTransaction(new Transaction.Function<Double>() {
-//                                        @Override
-//                                        public Double apply (Transaction transaction)  throws FirebaseFirestoreException {
-//
-//                                            DocumentSnapshot snapshot = transaction.get(documentReference);
-//
-//                                            Double newCountLike = snapshot.getDouble("chooseTwo") + 1;
-//
-//                                            transaction.update(documentReference,"chooseTwo",newCountLike);
-//
-//                                            return newCountLike;
-//
-//                                        }
-//
-//                                    });
-//                                    Map<String,Object> likeMap = new HashMap<>();
-//                                    likeMap.put(currentUser,mFirebaseUser.getUid());
-//
-//                                    mFirestore.collection(MESSAGES_CHILD).document(post_Id).collection("VotesUsers_"+post_Id)
-//                                            .document(currentUser).set(likeMap);
-//                                }
-//                            });
+                            viewHolder.messageImageViewTwo.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(final View view) {
+
+
+                                    final DocumentReference documentReference = mFirestore.collection(MESSAGES_CHILD).document(post_Id);
+
+                                    mFirestore.runTransaction(new Transaction.Function<Double>() {
+                                        @Override
+                                        public Double apply (Transaction transaction)  throws FirebaseFirestoreException {
+
+                                            DocumentSnapshot snapshot = transaction.get(documentReference);
+
+                                            newViewLikeTwo = snapshot.getDouble("chooseTwo") + 1;
+
+                                            transaction.update(documentReference,"chooseTwo",newViewLikeTwo);
+
+                                            return newViewLikeTwo;
+
+                                        }
+
+                                    });
+                                    Map<String,Object> likeMap = new HashMap<>();
+                                    likeMap.put(currentUser,mFirebaseUser.getUid());
+
+                                    mFirestore.collection(MESSAGES_CHILD).document(post_Id).collection("VotesUsers_"+post_Id)
+                                            .document(currentUser).set(likeMap);
+                                }
+                            });
                         }
                     }
             });

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.max.testproject.R;
 import com.example.max.testproject.activities.AddImage;
@@ -41,9 +42,9 @@ import java.util.List;
 
 public class OneVsOneActivity extends MainActivity {
 
-    private Button mOneVsOneOne;
-    private Button mBeforeAfterOne;
-    private Button mOtherOne;
+    private ImageView mOneVsOneOne;
+    private ImageView mBeforeAfterOne;
+    private ImageView mOtherOne;
 
     private RecyclerView mMessageRecyclerViewOneVsOne;
     private LinearLayoutManager mLinearLayoutManagerOneVsOne;
@@ -95,9 +96,9 @@ public class OneVsOneActivity extends MainActivity {
         postUsersOneVsOne = new ArrayList<>();
         postListAdapter = new PostListAdapter(getApplicationContext(), postUsersOneVsOne);
         mMessageRecyclerViewOneVsOne.setAdapter(postListAdapter);
-        mOneVsOneOne = (Button) findViewById(R.id.oneVsOneOne);
-        mBeforeAfterOne = (Button) findViewById(R.id.beforeAfterOne);
-        mOtherOne = (Button) findViewById(R.id.otherOne);
+        mOneVsOneOne = (ImageView) findViewById(R.id.oneVsOneOne);
+        mBeforeAfterOne = (ImageView) findViewById(R.id.beforeAfterOne);
+        mOtherOne = (ImageView) findViewById(R.id.otherOne);
 
 
 
@@ -163,6 +164,19 @@ public class OneVsOneActivity extends MainActivity {
         });
 
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        postListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        postListAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

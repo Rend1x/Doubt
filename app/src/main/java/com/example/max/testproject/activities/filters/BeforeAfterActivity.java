@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.max.testproject.R;
 import com.example.max.testproject.activities.AddImage;
@@ -41,9 +42,9 @@ import java.util.List;
 
 public class BeforeAfterActivity extends MainActivity {
 
-    private Button mOneVsOneBeforeAfter;
-    private Button mBeforeAfterBeforeAfter;
-    private Button mOtherBeforeAfter;
+    private ImageView mOneVsOneBeforeAfter;
+    private ImageView mBeforeAfterBeforeAfter;
+    private ImageView mOtherBeforeAfter;
 
     private RecyclerView mMessageRecyclerViewBeforeAfter;
     private LinearLayoutManager mLinearLayoutManagerBeforeAfter;
@@ -95,9 +96,9 @@ public class BeforeAfterActivity extends MainActivity {
         postUsersBeforeAfter = new ArrayList<>();
         postListAdapter = new PostListAdapter(getApplicationContext(), postUsersBeforeAfter);
         mMessageRecyclerViewBeforeAfter.setAdapter(postListAdapter);
-        mOneVsOneBeforeAfter = (Button) findViewById(R.id.oneVsOneBefore);
-        mBeforeAfterBeforeAfter = (Button) findViewById(R.id.beforeAfterBefore);
-        mOtherBeforeAfter = (Button) findViewById(R.id.otherBefore);
+        mOneVsOneBeforeAfter = (ImageView) findViewById(R.id.oneVsOneBefore);
+        mBeforeAfterBeforeAfter = (ImageView) findViewById(R.id.beforeAfterBefore);
+        mOtherBeforeAfter = (ImageView) findViewById(R.id.otherBefore);
 
 
         mOneVsOneBeforeAfter.setOnClickListener(new View.OnClickListener() {

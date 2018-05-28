@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:background="#ddd"
+    android:background="#fff"
     tools:context="com.example.max.testproject.activities.AddImage"
     tools:layout_editor_absoluteY="25dp">
 
@@ -21,14 +21,14 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_gravity="center|top"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="60dp"
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:scaleType="fitXY"
-        android:src="@drawable/add_image_button"
+        android:src="@drawable/addicon"
         app:layout_constraintBottom_toTopOf="@+id/navigation"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -40,11 +40,15 @@
 
     <EditText
         android:id="@+id/messageEditText"
+        style="@style/Widget.AppCompat.EditText"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginTop="192dp"
+        android:layout_marginTop="268dp"
         android:layout_weight="1.0"
+        android:background="#00000000"
+        android:gravity="center"
         android:hint="@string/hint_edit"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -59,20 +63,19 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_gravity="center|top"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
         android:scaleType="fitXY"
-        android:src="@drawable/add_image_button"
+        android:src="@drawable/addicon"
         app:layout_constraintBottom_toBottomOf="@+id/image_one"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/image_one"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/image_one"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="MissingConstraints" />
 
 
-    <Button
+    <ImageView
         android:id="@+id/sendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -81,13 +84,13 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/sendButton"
+        android:src="@drawable/send"
         app:layout_constraintBottom_toTopOf="@+id/messageEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.076"
+        app:layout_constraintVertical_bias="0.29"
         tools:ignore="MissingConstraints" />
 
     <android.support.design.widget.BottomNavigationView
@@ -108,34 +111,36 @@
         ads:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/menu_bottom_nav" />
 
-    <Button
+    <ImageView
         android:id="@+id/oneVsOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="@string/oneVsOne"
+        android:src="@drawable/onevsone"
         app:layout_constraintBottom_toTopOf="@+id/image_one"
         app:layout_constraintEnd_toStartOf="@+id/beforeAfter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.527" />
+        app:layout_constraintVertical_bias="0.566" />
 
-    <Button
+    <ImageView
         android:id="@+id/beforeAfter"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="76dp"
-        android:text="@string/beforeAfter"
+        android:src="@drawable/before"
         app:layout_constraintBottom_toTopOf="@+id/image_two"
+        app:layout_constraintEnd_toStartOf="@+id/other"
         app:layout_constraintStart_toEndOf="@+id/oneVsOne"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.245" />
+        app:layout_constraintVertical_bias="0.455" />
 
-    <Button
+    <ImageView
         android:id="@+id/other"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -143,13 +148,13 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="76dp"
-        android:text="@string/other"
+        android:src="@drawable/other"
         app:layout_constraintBottom_toTopOf="@+id/image_two"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/beforeAfter"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.245" />
+        app:layout_constraintVertical_bias="0.449" />
 
 
 </android.support.constraint.ConstraintLayout>

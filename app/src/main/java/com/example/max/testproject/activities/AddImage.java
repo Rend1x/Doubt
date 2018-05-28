@@ -40,10 +40,10 @@ public class AddImage extends MainActivity
     private static final int Image_Request_Code_Two = 2;
     private int category = 0;
     private EditText mEditText;
-    private Button mSendButton;
-    private Button mOneVsOne;
-    private Button mBeforeAfter;
-    private Button mOther;
+    private ImageView mSendButton;
+    private ImageView mOneVsOne;
+    private ImageView mBeforeAfter;
+    private ImageView mOther;
     private ImageView mImageViewOne;
     private ImageView mImageViewTwo;
     private StorageReference storageReference;
@@ -92,11 +92,11 @@ public class AddImage extends MainActivity
 
         mImageViewOne = (ImageView) findViewById(R.id.image_one);
         mImageViewTwo = (ImageView) findViewById(R.id.image_two);
-        mSendButton = (Button) findViewById(R.id.sendButton);
+        mSendButton = (ImageView) findViewById(R.id.sendButton);
         mEditText = (EditText) findViewById(R.id.messageEditText);
-        mOneVsOne = (Button) findViewById(R.id.oneVsOne);
-        mBeforeAfter = (Button) findViewById(R.id.beforeAfter);
-        mOther = (Button) findViewById(R.id.other);
+        mOneVsOne = (ImageView) findViewById(R.id.oneVsOne);
+        mBeforeAfter = (ImageView) findViewById(R.id.beforeAfter);
+        mOther = (ImageView) findViewById(R.id.other);
 
 
         mFirestore = FirebaseFirestore.getInstance();

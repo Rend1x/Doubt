@@ -1,8 +1,11 @@
 package com.example.max.testproject.activities;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +24,29 @@ public class FullImageActivity extends MainActivity {
         setContentView(R.layout.activity_full_image);
 
 
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_add_choose_page:
+                        Intent addChoose = new Intent(FullImageActivity.this, AddImage.class);
+                        startActivity(addChoose);
+                        break;
+
+                    case R.id.navigation_tape_page:
+                        Intent tapePage = new Intent(FullImageActivity.this, MainActivity.class);
+                        startActivity(tapePage);
+                        break;
+
+                    case R.id.navigation_home_page:
+                        Intent homePage = new Intent(FullImageActivity.this, UserActivity.class);
+                        startActivity(homePage);
+                        break;
+                }
+                return false;
+            }
+        });
 
         userNameTextView = (TextView) findViewById(R.id.userNameTextView);
         userTextView = (TextView) findViewById(R.id.userTextView);

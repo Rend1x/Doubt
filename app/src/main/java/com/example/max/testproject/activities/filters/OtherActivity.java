@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.max.testproject.R;
 import com.example.max.testproject.activities.AddImage;
@@ -41,9 +42,9 @@ import java.util.List;
 
 public class OtherActivity extends MainActivity {
 
-    private Button mOneVsOneOther;
-    private Button mBeforeAfterOther;
-    private Button mOtherOther;
+    private ImageView mOneVsOneOther;
+    private ImageView mBeforeAfterOther;
+    private ImageView mOtherOther;
 
     private RecyclerView mMessageRecyclerViewOther;
     private LinearLayoutManager mLinearLayoutManagerOther;
@@ -95,9 +96,9 @@ public class OtherActivity extends MainActivity {
         postUsersOther = new ArrayList<>();
         postListAdapter = new PostListAdapter(getApplicationContext(), postUsersOther);
         mMessageRecyclerViewOther.setAdapter(postListAdapter);
-        mOneVsOneOther = (Button) findViewById(R.id.oneVsOneOther);
-        mBeforeAfterOther = (Button) findViewById(R.id.beforeAfterOther);
-        mOtherOther = (Button) findViewById(R.id.otherOther);
+        mOneVsOneOther = (ImageView) findViewById(R.id.oneVsOneOther);
+        mBeforeAfterOther = (ImageView) findViewById(R.id.beforeAfterOther);
+        mOtherOther = (ImageView) findViewById(R.id.otherOther);
 
         mOneVsOneOther.setOnClickListener(new View.OnClickListener() {
             @Override

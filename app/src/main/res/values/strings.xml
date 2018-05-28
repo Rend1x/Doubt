@@ -7,7 +7,7 @@
 
     <string name="title_activity_add_image">Doubt</string>
     <string name="sendButton">Поделиться</string>
-    <string name="hint_edit">Пиши здесь</string>
+    <string name="hint_edit">Нажмите, чтобы задать свой вопрос</string>
 
     <string name="title_activity_user">UserActivity</string>
 

@@ -122,7 +122,7 @@ public class UserActivity extends MainActivity implements GoogleApiClient.OnConn
         super.onStart();
 
         mFirestore.collection(MESSAGES_CHILD)
-                .whereEqualTo("id",mFirebaseAuth.getCurrentUser().getUid())
+                .whereEqualTo("id",mFirebaseUser.getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {

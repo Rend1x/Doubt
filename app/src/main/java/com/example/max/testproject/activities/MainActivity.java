@@ -81,9 +81,9 @@ public class MainActivity extends AppCompatActivity
     public FirebaseUser mFirebaseUser;
 
 
-    private Button mOneVsOneMain;
-    private Button mBeforeAfterMain;
-    private Button mOtherMain;
+    private ImageView mOneVsOneMain;
+    private ImageView mBeforeAfterMain;
+    private ImageView mOtherMain;
 
     public FirebaseFirestore mFirestore;
 
@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         mUsername = ANONYMOUS;
-
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
@@ -145,9 +144,9 @@ public class MainActivity extends AppCompatActivity
         mLinearLayoutManager.setStackFromEnd(true);
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
         mFirestore = FirebaseFirestore.getInstance();
-        mOneVsOneMain = (Button) findViewById(R.id.oneVsOneMain);
-        mBeforeAfterMain = (Button) findViewById(R.id.beforeAfterMain);
-        mOtherMain = (Button) findViewById(R.id.otherMain);
+        mOneVsOneMain = (ImageView) findViewById(R.id.oneVsOneMain);
+        mBeforeAfterMain = (ImageView) findViewById(R.id.beforeAfterMain);
+        mOtherMain = (ImageView) findViewById(R.id.otherMain);
         postUsers = new ArrayList<>();
         postListAdapter = new PostListAdapter(getApplicationContext(), postUsers);
         mMessageRecyclerView.setAdapter(postListAdapter);
@@ -215,6 +214,19 @@ public class MainActivity extends AppCompatActivity
         });
 
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        postListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        postListAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
